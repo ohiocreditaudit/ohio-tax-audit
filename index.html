@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ohio Owner-Occupancy Credit Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;680&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF8F5; --panel:#FFFFFF; --ink:#1A1512; --ink2:#57504A; --muted:#8C857D;
+  --border:rgba(26,21,18,.11); --border-strong:rgba(26,21,18,.20);
+  --nodata:#ECE8E2; --nodata-line:rgba(26,21,18,.11);
+  --ramp0:#FBE6D4; --ramp1:#C2410C; --accent:#C2410C; --accent2:#6D4FC4;
+  --card-shadow:0 1px 2px rgba(26,21,18,.04),0 10px 30px rgba(26,21,18,.05);
+  --radius:24px; --radius-lg:32px;
+  --disp:"Inter Tight","Inter",system-ui,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",monospace;
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);
+  font-size:14px;line-height:1.5;padding:34px 20px;
+  background-image:
+    radial-gradient(620px 420px at 10% 2%,rgba(194,65,12,.05),transparent 70%),
+    radial-gradient(700px 480px at 94% 100%,rgba(109,79,196,.045),transparent 70%);
+  background-attachment:fixed}
+.page{max-width:1240px;margin:0 auto}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);display:inline-block;padding:5px 12px;
+  border:1px solid var(--border);border-radius:999px;background:rgba(249,164,116,.05);
+  box-shadow:0 0 20px rgba(249,164,116,.08)}
+h1{font-family:var(--disp);font-weight:680;font-size:clamp(30px,5vw,50px);
+  line-height:1.03;letter-spacing:-.03em;margin:16px 0 0;text-wrap:balance;
+  background:linear-gradient(160deg,#1A1512 30%,#7A4A2E);-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+.lede{color:var(--ink2);font-size:16px;max-width:62ch;margin:13px 0 0;line-height:1.55}
+.lede b{color:var(--accent);font-weight:600}
+.statstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 4px}
+.tile{border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;
+  background:var(--panel);box-shadow:var(--card-shadow);
+  transition:border-color .2s,transform .2s,box-shadow .2s}
+.tile:hover{border-color:var(--border-strong);transform:translateY(-2px);
+  box-shadow:0 2px 4px rgba(26,21,18,.05),0 16px 40px rgba(26,21,18,.07)}
+.tile .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted)}
+.tile .v{font-family:var(--disp);font-weight:640;font-size:26px;margin-top:9px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
+.tile .v.accent{color:var(--accent)}
+.tile .m{font-size:12px;color:var(--ink2);margin-top:5px}
+.toggles{display:flex;gap:8px;margin:28px 0 16px;flex-wrap:wrap}
+.toggles button{font-family:var(--body);font-size:13px;font-weight:500;
+  border:1px solid var(--border);background:transparent;color:var(--ink2);
+  padding:9px 16px;border-radius:999px;cursor:pointer;transition:all .18s}
+.toggles button:hover{border-color:var(--border-strong);color:var(--ink)}
+.toggles button.on{background:var(--accent);color:#1A120D;border-color:transparent;
+  font-weight:600;box-shadow:0 0 26px rgba(249,164,116,.22)}
+.toggles button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.mapbox{flex:1 1 460px;max-width:820px;border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:14px;background:var(--panel);
+  box-shadow:var(--card-shadow)}
+svg{width:100%;height:auto;display:block}
+path[data-name]{fill:var(--nodata);stroke:var(--nodata-line);stroke-width:.7;cursor:default}
+path[data-name].has{cursor:pointer}
+path[data-name].hover{stroke:var(--accent);stroke-width:2}
+path[data-name].pinned{stroke:var(--accent);stroke-width:2.6}
+path[data-name].partner{stroke:var(--accent2);stroke-width:1.6}
+.link-line{fill:none;stroke:var(--accent2);stroke-width:1.7;opacity:.9;pointer-events:none;
+  filter:drop-shadow(0 0 6px rgba(195,163,255,.4))}
+.link-num{font-family:var(--mono);font-size:12px;font-weight:700;fill:#3A1D0A;
+  pointer-events:none;paint-order:stroke;stroke:#fff;stroke-width:3.2px}
+.cname{font-size:9.5px;fill:var(--ink2);pointer-events:none;text-anchor:middle;
+  paint-order:stroke;stroke:#fff;stroke-width:2.6px;font-weight:600}
+.rightcol{flex:0 1 340px;display:flex;flex-direction:column;gap:14px}
+.panel{background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:22px;min-height:120px;
+  box-shadow:var(--card-shadow);transition:border-color .2s}
+.panel:hover{border-color:var(--border-strong)}
+#panel{min-height:200px}
+.panel h2{font-family:var(--disp);font-size:18px;font-weight:620;
+  letter-spacing:-.01em;margin-bottom:3px}
+.panel .tag{font-family:var(--mono);font-size:11px;color:var(--muted);
+  margin-bottom:14px;letter-spacing:.02em}
+.stat{display:flex;justify-content:space-between;gap:10px;padding:7px 0;
+  border-bottom:1px solid var(--border);font-size:13px;color:var(--ink2)}
+.stat:last-child{border-bottom:0}
+.stat b{color:var(--ink);font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-weight:600}
+.tierrow{display:flex;align-items:center;gap:8px;margin:6px 0 10px;flex-wrap:wrap}
+.tierlbl{font-size:12px;color:var(--muted)}
+.tierbox{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;
+  cursor:pointer;padding:5px 11px;border-radius:999px;border:1px solid var(--border);
+  color:var(--ink2);user-select:none;transition:all .16s}
+.tierbox:hover{border-color:var(--border-strong)}
+.tierbox input{accent-color:var(--accent);cursor:pointer;margin:0;width:14px;height:14px}
+.tierbox:has(input:checked){background:rgba(249,164,116,.10);border-color:var(--accent);
+  color:var(--ink)}
+.tiertot{font-family:var(--mono);font-size:11px;color:var(--accent);
+  margin-bottom:6px;letter-spacing:.02em}
+.stat.totrow{border-bottom:0;padding:5px 0}
+.stat.totrow span{color:var(--ink2)}
+.stat.totrow b{font-family:var(--disp);font-size:20px;font-weight:660}
+.tierdetail{margin-top:10px;font-size:12px;border-top:1px solid var(--border);padding-top:4px}
+.tierdetail summary{cursor:pointer;color:var(--ink2);font-size:12px;padding:6px 0;
+  user-select:none;list-style:none}
+.tierdetail summary::-webkit-details-marker{display:none}
+.tierdetail summary::before{content:"\25B8  ";color:var(--accent)}
+.tierdetail[open] summary::before{content:"\25BE  "}
+.tierhead{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--accent);margin:10px 0 2px}
+.stat.sub2{font-size:12px;padding:4px 0;border-bottom:0}
+.note{color:var(--muted);font-size:12px;margin-top:12px;line-height:1.5}
+.dlbtn{display:inline-flex;align-items:center;gap:7px;margin-top:14px;
+  font-family:var(--body);font-size:13px;font-weight:600;text-decoration:none;
+  color:#fff;background:var(--accent);padding:9px 15px;border-radius:999px;
+  transition:transform .16s,box-shadow .16s;box-shadow:0 6px 18px rgba(194,65,12,.22)}
+.dlbtn:hover{transform:translateY(-1px);box-shadow:0 9px 24px rgba(194,65,12,.30)}
+.dlbtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.dlbtn svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2}
+.dlcsv{display:inline-block;margin:9px 0 0 4px;font-size:12px;color:var(--ink2);
+  text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--border-strong)}
+.dlcsv:hover{color:var(--accent);text-decoration-color:var(--accent)}
+.dlcsv:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.disclaimer{margin-top:12px;padding:11px 13px;border-radius:12px;
+  background:rgba(194,65,12,.05);border:1px solid rgba(194,65,12,.16);
+  color:var(--ink2);font-size:11.5px;line-height:1.5}
+.disclaimer b{color:var(--accent);font-weight:600}
+.pinhint{font-family:var(--mono);font-size:10.5px;color:var(--accent);
+  margin:-6px 0 10px;letter-spacing:.02em}
+.legend{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;
+  color:var(--muted);font-family:var(--mono)}
+.grad{width:110px;height:8px;border-radius:5px;
+  background:linear-gradient(90deg,var(--ramp0),var(--ramp1))}
+.chip{width:14px;height:8px;border-radius:3px;background:var(--nodata);
+  border:1px solid var(--nodata-line);display:inline-block}
+.foot{color:var(--muted);font-size:11px;margin-top:26px;text-align:center;
+  font-family:var(--mono);letter-spacing:.02em}
+@media (max-width:900px){.rightcol{flex:1 1 100%;max-width:none}}
+@media (max-width:720px){.statstrip{grid-template-columns:repeat(2,1fr)}
+  body{padding:22px 14px}.panel,.mapbox{border-radius:var(--radius)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<div class="page">
+<header>
+  <span class="eyebrow">Ohio Dept. of Taxation &middot; ORC 323.152(B)</span>
+  <h1>Owner-Occupancy Credit Audit</h1>
+  <p class="lede">Ohio gives homeowners a <b>2.5% tax break</b> on the one home they
+  live in. This map finds that same credit showing up where it probably shouldn't:
+  the same name on two homes, in two counties, or on a home owned by a company.
+  <b>Click</b> any county to see its records and download the list. Gray counties
+  aren't loaded yet.</p>
+</header>
+<div class="statstrip"><div class="tile"><div class="k">Counties loaded</div><div class="v">52</div><div class="m">counties with data</div></div><div class="tile"><div class="k">Extra credit / yr, one county</div><div class="v accent">$2,000,145</div><div class="m">same name, 2+ homes in a county</div></div><div class="tile"><div class="k">Strong cross-county leads</div><div class="v accent">12,814</div><div class="m">same owner in two counties</div></div><div class="tile"><div class="k">Company-owned credit / yr</div><div class="v accent">$2,025,629</div><div class="m">held by an LLC or corporation</div></div></div>
+<div class="toggles">
+  <button data-mode="incounty" class="on">Same county</button>
+  <button data-mode="cross">Across counties</button>
+  <button data-mode="entity">Company-owned</button>
+</div>
+<div class="wrap">
+  <div class="mapbox">
+    <svg viewBox="0 0 760 631" role="img" aria-label="Map of Ohio counties">
+      <g id="counties"><path id="c-Geauga" data-name="Geauga" d="M604.9,97.5L604.9,97.7L604.9,111.3L552.5,111.2L552.5,72.1L565.4,72.0L565.5,59.5L591.6,59.4L591.5,46.5L604.8,46.4L604.9,49.0L604.9,84.1L604.9,97.5Z"/><path id="c-Hancock" data-name="Hancock" d="M278.6,143.2L278.7,174.1L265.8,204.8L216.6,204.5L216.6,186.8L216.5,143.1L278.6,143.2Z"/><path id="c-Hardin" data-name="Hardin" d="M265.2,260.3L216.6,254.2L216.6,235.5L216.6,204.5L265.8,204.8L268.5,225.4L278.7,228.0L279.3,258.3L278.9,260.1L265.2,260.3Z"/><path id="c-Holmes" data-name="Holmes" d="M453.3,231.3L517.6,231.4L517.6,233.6L517.7,237.2L514.9,271.0L509.6,270.8L445.4,268.8L446.2,248.1L440.6,249.0L440.6,231.4L453.3,231.3Z"/><path id="c-Licking" data-name="Licking" d="M391.8,361.7L364.7,360.1L367.5,327.2L369.0,300.5L406.1,302.6L421.2,306.8L426.3,307.0L443.9,307.2L445.7,307.2L445.1,319.9L443.5,358.2L438.8,364.7L407.9,361.7L406.5,362.6L391.8,361.7Z"/><path id="c-Madison" data-name="Madison" d="M267.4,329.7L307.5,330.4L301.1,340.7L302.5,382.5L301.3,403.2L247.2,399.4L247.8,391.6L247.8,390.3L248.0,389.5L256.0,390.2L265.7,347.6L267.4,329.7Z"/><path id="c-Miami" data-name="Miami" d="M179.2,369.6L179.1,363.0L142.9,363.6L142.0,314.6L197.3,316.9L195.5,342.3L193.5,370.6L192.8,370.6L187.2,370.2L186.3,370.1L179.6,369.6L179.2,369.6Z"/><path id="c-Noble" data-name="Noble" d="M525.9,422.4L526.2,408.8L518.5,408.5L519.0,393.0L511.2,392.6L511.6,377.2L527.0,377.8L527.2,367.5L542.7,368.0L553.2,358.1L573.7,358.0L573.3,372.7L563.0,372.5L562.2,401.1L567.1,419.0L552.0,419.8L541.5,411.9L541.4,423.0L525.9,422.4Z"/><path id="c-Pike" data-name="Pike" d="M329.5,533.7L306.8,533.1L298.8,523.3L283.3,516.3L287.7,491.2L364.3,496.3L361.4,535.3L329.5,533.7Z"/><path id="c-Sandusky" data-name="Sandusky" d="M279.4,84.3L289.7,91.9L341.8,91.7L355.9,96.7L356.8,121.5L357.0,127.6L278.7,127.8L279.4,84.3Z"/><path id="c-Seneca" data-name="Seneca" d="M294.2,174.0L278.7,174.1L278.6,143.2L278.7,127.8L357.0,127.6L358.4,173.3L320.2,173.9L294.2,174.0Z"/><path id="c-Union" data-name="Union" d="M261.0,308.9L265.2,260.3L278.9,260.1L301.9,259.8L301.8,271.0L301.9,306.2L312.1,306.2L312.4,324.1L312.4,330.5L307.5,330.4L267.4,329.7L268.6,309.6L261.0,308.9Z"/><path id="c-Wayne" data-name="Wayne" d="M453.1,190.2L453.0,185.1L453.1,183.8L452.9,174.2L512.4,174.7L517.9,187.8L517.6,231.4L453.3,231.3L453.5,192.8L453.1,190.2Z"/><path id="c-Wood" data-name="Wood" d="M240.5,79.3L258.5,63.7L279.2,63.4L279.4,84.3L278.7,127.8L278.6,143.2L216.5,143.1L216.2,99.5L239.2,85.6L240.5,79.3Z"/><path id="c-Allen" data-name="Allen" d="M154.5,197.6L185.6,197.3L185.6,189.5L216.6,186.8L216.6,204.5L216.6,235.5L185.9,235.8L170.3,228.2L146.9,228.4L146.8,205.2L154.5,197.6Z"/><path id="c-Brown" data-name="Brown" d="M213.4,567.0L208.0,564.3L205.5,563.6L203.3,563.7L194.4,566.6L193.3,566.6L201.1,485.8L201.3,481.2L218.5,482.4L217.7,522.3L244.5,522.5L240.2,589.7L240.1,590.2L232.5,587.5L231.5,587.0L231.0,585.9L230.4,583.6L220.2,569.8L219.4,569.1L217.9,568.2L213.4,567.0Z"/><path id="c-Clinton" data-name="Clinton" d="M202.0,447.6L203.5,425.5L244.9,428.9L257.6,429.9L255.6,459.2L229.5,479.6L218.5,482.4L201.3,481.2L199.5,481.0L202.0,447.6Z"/><path id="c-Defiance" data-name="Defiance" d="M91.9,107.7L91.9,100.6L91.9,100.0L91.9,97.4L154.3,97.2L169.6,97.1L169.6,143.4L154.3,143.5L154.3,135.8L138.7,135.7L138.7,127.9L92.0,128.1L92.0,124.8L91.9,107.7Z"/><path id="c-Fayette" data-name="Fayette" d="M299.4,434.9L292.5,446.6L285.1,459.4L284.7,459.4L255.6,459.2L257.6,429.9L244.9,428.9L247.2,399.4L301.3,403.2L299.4,434.9Z"/><path id="c-Meigs" data-name="Meigs" d="M504.1,494.1L504.5,509.2L495.7,511.6L495.4,513.1L495.8,515.6L496.9,517.7L498.2,519.0L501.0,521.5L502.2,523.4L503.3,537.8L502.7,539.2L487.2,547.1L482.7,547.6L480.2,545.2L480.0,544.6L480.2,543.5L483.7,539.4L484.1,538.5L483.8,537.1L481.2,531.6L479.0,527.9L470.0,521.2L468.0,520.8L465.5,521.6L464.7,522.9L464.2,525.4L463.4,527.1L457.8,531.2L457.0,533.5L457.5,525.6L426.8,521.2L429.0,489.8L434.1,490.1L504.1,494.1Z"/><path id="c-Mercer" data-name="Mercer" d="M138.9,249.1L138.9,286.0L141.8,286.8L142.2,286.8L141.8,286.8L91.9,287.1L92.0,267.2L92.1,256.1L92.1,248.3L92.2,235.5L92.1,232.7L92.1,230.2L92.1,227.6L92.2,227.2L92.2,225.3L92.1,222.4L92.2,220.7L138.8,220.7L138.8,228.4L138.9,249.1Z"/><path id="c-Morrow" data-name="Morrow" d="M372.2,223.7L385.7,224.1L386.2,252.2L383.1,288.4L369.8,287.6L344.9,286.1L345.5,276.1L332.6,272.8L341.0,262.7L341.1,235.4L354.3,235.2L354.5,224.8L372.2,223.7Z"/><path id="c-Muskingum" data-name="Muskingum" d="M460.0,389.9L460.5,381.9L447.4,381.1L448.4,365.4L438.8,364.7L443.5,358.2L445.1,319.9L508.6,322.4L508.6,322.5L507.0,361.5L511.6,377.2L511.2,392.6L460.0,389.9Z"/><path id="c-Paulding" data-name="Paulding" d="M154.3,143.5L154.3,174.4L146.5,174.4L92.0,174.6L92.0,156.9L92.0,155.6L92.0,143.6L92.0,142.1L92.0,142.0L92.0,128.1L138.7,127.9L138.7,135.7L154.3,135.8L154.3,143.5Z"/><path id="c-Pickaway" data-name="Pickaway" d="M370.4,443.3L335.6,441.3L337.5,436.5L299.4,434.9L301.3,403.2L302.5,382.5L333.6,384.0L359.1,385.6L356.6,426.9L371.6,428.1L370.4,443.3Z"/><path id="c-Portage" data-name="Portage" d="M552.2,174.7L552.4,148.7L552.4,148.5L552.4,123.8L552.5,114.1L552.4,113.2L552.5,112.4L552.5,111.2L604.9,111.3L604.9,124.7L605.0,149.0L605.1,174.9L593.6,174.8L552.2,174.7Z"/><path id="c-Preble" data-name="Preble" d="M90.5,387.3L90.5,387.1L90.5,384.8L90.5,382.7L90.5,382.2L90.6,380.4L90.6,380.0L90.6,377.1L90.6,375.8L90.6,375.3L90.7,371.8L90.7,368.7L90.7,368.6L90.8,364.1L134.9,363.8L135.7,421.7L135.8,425.6L90.4,425.8L90.4,425.7L90.5,415.0L90.5,407.8L90.5,405.9L90.5,397.7L90.5,387.3Z"/><path id="c-Richland" data-name="Richland" d="M414.1,190.0L419.3,220.9L424.6,221.0L424.9,251.3L419.8,252.1L386.2,252.2L385.7,224.1L372.2,223.7L372.5,173.5L411.9,174.0L413.9,174.0L414.1,190.0Z"/><path id="c-Ross" data-name="Ross" d="M335.6,441.3L370.4,443.3L370.4,443.7L369.3,461.0L367.4,489.3L366.9,496.4L364.3,496.3L287.7,491.2L282.3,478.9L285.1,459.4L292.5,446.6L299.4,434.9L337.5,436.5L335.6,441.3Z"/><path id="c-Shelby" data-name="Shelby" d="M197.3,316.9L142.0,314.6L141.8,286.8L142.2,286.8L141.8,286.8L154.7,282.5L154.6,264.4L200.1,264.0L198.4,301.1L197.3,316.9Z"/><path id="c-Stark" data-name="Stark" d="M542.2,189.0L548.6,189.2L552.2,174.7L593.6,174.8L593.6,176.0L593.6,182.4L593.6,182.5L593.6,183.2L593.6,183.4L593.6,183.7L593.6,184.7L593.6,184.8L593.6,190.1L593.5,220.8L573.3,221.6L572.8,234.5L562.4,234.3L517.7,237.2L517.6,233.6L517.6,231.4L517.9,187.8L518.1,187.9L542.2,189.0Z"/><path id="c-Tuscarawas" data-name="Tuscarawas" d="M517.7,237.2L562.4,234.3L561.9,249.3L569.6,249.6L568.9,272.8L568.2,295.8L560.2,295.6L559.7,311.5L521.3,310.3L522.2,284.4L509.2,283.9L509.6,270.8L514.9,271.0L517.7,237.2Z"/><path id="c-Van_Wert" data-name="Van Wert" d="M154.5,197.6L146.8,205.2L146.9,228.4L138.8,228.4L138.8,220.7L92.2,220.7L92.1,218.2L92.1,214.1L92.0,186.4L92.0,174.6L146.5,174.4L146.6,189.8L154.5,197.6Z"/><path id="c-Washington" data-name="Washington" d="M555.2,465.6L554.6,465.7L553.4,465.4L552.2,463.9L550.4,457.5L549.6,456.4L546.5,453.9L545.1,453.6L543.8,453.8L542.2,454.7L532.1,463.7L523.6,477.3L511.4,483.2L507.9,488.5L507.9,478.4L490.1,469.9L491.3,446.5L494.2,438.8L509.7,441.1L508.9,422.9L525.9,422.4L541.4,423.0L541.5,411.9L552.0,419.8L567.1,419.0L572.0,423.8L600.4,425.0L600.1,430.6L596.7,434.1L588.1,443.9L576.2,457.4L575.1,457.9L571.7,457.2L568.8,457.9L565.5,459.8L558.4,465.0L557.1,465.4L555.2,465.6Z"/><path id="c-Williams" data-name="Williams" d="M154.3,97.2L91.9,97.4L91.9,95.8L91.8,86.5L91.8,84.3L91.8,79.1L91.8,79.0L91.7,64.4L91.7,61.2L91.7,61.0L91.6,53.5L91.6,49.7L141.3,48.2L146.5,48.0L149.0,81.9L154.3,86.9L154.3,97.2Z"/><path id="c-Wyandot" data-name="Wyandot" d="M320.4,225.2L294.3,225.4L278.7,228.0L268.5,225.4L265.8,204.8L278.7,174.1L294.2,174.0L320.2,173.9L320.4,225.2Z"/><path id="c-Adams" data-name="Adams" d="M248.6,589.1L248.1,590.1L247.7,591.0L246.9,591.5L245.8,591.8L243.7,591.4L240.1,590.2L240.2,589.7L244.5,522.5L252.8,522.7L283.3,516.3L298.8,523.3L299.5,595.8L297.3,596.2L292.1,592.7L291.6,590.9L290.4,589.4L285.6,586.3L266.2,578.8L265.1,578.5L263.4,578.7L257.8,580.4L252.3,581.9L250.8,582.7L249.5,584.3L248.6,589.1Z"/><path id="c-Ashland" data-name="Ashland" d="M414.1,190.0L413.9,174.0L411.9,174.0L411.4,161.2L424.9,161.1L447.2,161.5L447.0,174.1L452.9,174.2L453.1,183.8L453.0,185.1L453.1,190.2L453.5,192.8L453.3,231.3L440.6,231.4L440.6,249.0L424.9,251.3L424.6,221.0L419.3,220.9L414.1,190.0Z"/><path id="c-Auglaize" data-name="Auglaize" d="M138.9,249.1L138.8,228.4L146.9,228.4L170.3,228.2L185.9,235.8L216.6,235.5L216.6,254.2L201.2,254.8L200.1,264.0L154.6,264.4L154.7,282.5L141.8,286.8L138.9,286.0L138.9,249.1Z"/><path id="c-Belmont" data-name="Belmont" d="M645.1,322.4L642.2,333.7L641.3,339.0L641.6,340.7L641.6,342.8L641.5,343.5L640.4,354.6L640.0,354.9L637.8,356.8L631.5,364.0L631.1,364.8L631.0,366.1L631.5,367.5L630.6,376.1L573.3,372.7L573.7,358.0L574.8,319.3L600.5,320.3L621.1,321.2L645.4,321.6L645.1,322.4Z"/><path id="c-Butler" data-name="Butler" d="M153.4,464.5L152.7,474.4L147.6,473.5L142.6,473.3L140.1,472.9L115.3,471.0L89.8,472.2L89.8,471.4L90.1,456.9L90.3,441.7L90.3,435.8L90.4,433.9L90.4,429.2L90.4,426.0L90.4,425.9L90.4,425.8L135.8,425.6L135.7,421.7L136.4,421.8L151.1,421.9L155.6,429.1L153.4,464.5Z"/><path id="c-Carroll" data-name="Carroll" d="M623.9,243.5L616.0,251.1L613.2,274.4L568.9,272.8L569.6,249.6L561.9,249.3L562.4,234.3L572.8,234.5L573.3,221.6L593.5,220.8L616.5,221.0L616.4,235.7L623.9,243.5Z"/><path id="c-Clark" data-name="Clark" d="M193.5,370.6L195.5,342.3L265.7,347.6L256.0,390.2L248.0,389.5L223.4,385.1L223.7,380.7L193.2,375.8L193.2,375.0L193.2,374.8L193.4,373.0L193.4,371.0L193.5,370.6Z"/><path id="c-Clermont" data-name="Clermont" d="M165.4,478.2L199.5,481.0L201.3,481.2L201.1,485.8L193.3,566.6L190.8,566.6L172.7,561.0L171.7,560.4L170.0,558.3L169.4,556.5L169.2,556.0L168.9,552.0L169.0,548.2L169.1,547.2L168.8,544.9L159.3,524.9L158.1,523.1L157.2,522.2L157.7,486.0L165.4,478.2Z"/><path id="c-Columbiana" data-name="Columbiana" d="M670.1,190.4L670.2,199.0L670.2,199.2L670.2,199.4L670.2,207.8L670.2,209.4L670.2,236.5L664.6,239.2L660.8,239.8L660.1,239.2L659.1,238.9L655.6,239.9L654.7,240.5L650.4,245.6L650.1,246.5L623.9,243.5L616.4,235.7L616.5,221.0L593.5,220.8L593.6,190.1L670.1,190.4Z"/><path id="c-Crawford" data-name="Crawford" d="M320.4,225.2L320.2,173.9L358.4,173.3L372.5,173.5L372.2,223.7L354.5,224.8L320.4,225.2Z"/><path id="c-Darke" data-name="Darke" d="M91.9,294.6L91.9,287.1L141.8,286.8L142.0,314.6L142.9,363.6L140.2,363.7L140.1,363.7L139.9,363.7L134.9,363.8L90.8,364.1L90.8,363.2L90.8,362.2L91.0,348.5L91.1,343.4L91.1,340.8L91.3,330.5L91.3,327.0L91.3,326.6L91.5,317.6L91.6,315.4L91.6,314.4L91.7,309.9L91.9,296.0L91.9,294.6Z"/><path id="c-Delaware" data-name="Delaware" d="M369.1,298.4L369.1,299.2L369.0,300.5L367.5,327.2L326.7,325.0L315.3,324.4L312.4,324.1L312.1,306.2L301.9,306.2L301.8,271.0L332.6,272.8L345.5,276.1L344.9,286.1L369.8,287.6L369.1,298.4Z"/><path id="c-Erie" data-name="Erie" d="M375.8,64.5L377.1,64.7L378.6,63.4L378.9,63.5L378.5,67.7L377.8,69.0L377.4,69.2L375.6,69.3L372.4,67.6L371.0,66.5L371.1,66.1L373.3,63.2L374.9,63.2L375.4,63.6L375.8,64.5ZM341.8,91.7L346.1,91.7L348.0,91.4L354.8,89.3L358.6,87.6L376.6,85.4L377.5,85.7L381.5,91.1L387.0,96.4L387.1,97.0L395.0,102.0L401.0,104.8L403.0,105.3L405.4,105.3L408.2,104.5L412.1,102.6L416.6,99.6L421.5,97.3L423.4,97.0L424.1,122.6L356.8,121.5L355.9,96.7L341.8,91.7Z"/><path id="c-Franklin" data-name="Franklin" d="M360.8,361.3L359.1,385.6L333.6,384.0L302.5,382.5L301.1,340.7L307.5,330.4L312.4,330.5L312.4,324.1L315.3,324.4L326.7,325.0L367.5,327.2L364.7,360.1L360.9,359.8L360.8,361.3Z"/><path id="c-Hamilton" data-name="Hamilton" d="M131.6,509.5L119.0,513.1L116.7,513.1L116.2,512.9L115.1,512.5L108.0,508.3L107.3,507.7L103.4,501.9L101.6,500.6L100.0,500.0L98.6,500.2L96.9,501.6L94.1,505.7L89.7,507.4L89.7,499.7L89.8,498.4L89.8,498.2L89.8,482.9L89.8,482.3L89.8,481.7L89.8,479.8L89.8,478.1L89.8,472.2L115.3,471.0L140.1,472.9L142.6,473.3L147.6,473.5L152.7,474.4L165.4,478.2L157.7,486.0L157.2,522.2L156.3,521.2L142.0,509.4L133.8,508.0L132.7,509.0L132.1,509.3L131.6,509.5Z"/><path id="c-Highland" data-name="Highland" d="M285.1,459.4L282.3,478.9L287.7,491.2L283.3,516.3L252.8,522.7L244.5,522.5L217.7,522.3L218.5,482.4L229.5,479.6L255.6,459.2L284.7,459.4L285.1,459.4Z"/><path id="c-Huron" data-name="Huron" d="M358.4,173.3L357.0,127.6L356.8,121.5L424.1,122.6L424.9,161.1L411.4,161.2L411.9,174.0L372.5,173.5L358.4,173.3Z"/><path id="c-Jefferson" data-name="Jefferson" d="M657.0,279.4L656.7,281.9L658.1,285.7L659.3,293.3L658.9,295.1L657.1,299.9L654.3,304.3L653.3,305.0L652.3,306.1L647.8,316.2L645.4,321.6L621.1,321.2L623.5,274.7L613.2,274.4L616.0,251.1L623.9,243.5L650.1,246.5L650.3,248.0L657.9,262.7L659.4,264.1L657.6,272.6L657.0,279.4Z"/><path id="c-Lawrence" data-name="Lawrence" d="M402.0,630.3L400.1,630.8L394.7,631.3L390.2,628.2L380.5,613.4L377.2,608.0L376.3,607.0L372.5,604.2L371.7,604.0L363.8,603.8L362.4,603.3L360.2,601.9L370.4,597.3L367.2,582.6L375.0,583.1L382.6,552.7L385.9,553.0L386.0,553.0L392.7,553.6L391.7,565.1L405.1,566.3L406.6,582.2L422.5,583.3L421.5,599.4L431.6,599.8L431.0,600.5L430.7,601.6L430.8,603.8L430.5,607.4L428.0,620.1L427.1,622.5L426.6,623.4L425.8,624.2L424.4,624.9L402.0,630.3Z"/><path id="c-Lorain" data-name="Lorain" d="M474.7,83.2L474.2,110.6L486.9,112.0L486.8,124.1L484.1,124.1L483.0,124.1L481.9,124.0L481.1,124.1L480.2,124.2L474.1,124.2L473.9,137.4L460.6,137.4L460.3,148.6L447.4,148.5L447.2,161.5L424.9,161.1L424.1,122.6L423.4,97.0L425.2,96.7L431.0,97.0L432.1,96.9L434.1,96.6L436.0,96.0L444.3,90.6L444.9,90.0L445.2,89.1L445.4,89.0L445.8,89.4L448.0,88.9L457.6,85.2L468.7,81.6L471.1,81.8L474.7,83.2Z"/><path id="c-Mahoning" data-name="Mahoning" d="M670.2,149.1L670.2,149.2L670.2,150.6L670.2,152.2L670.2,154.1L670.2,154.9L670.2,156.7L670.2,158.2L670.2,159.5L670.2,160.0L670.2,160.2L670.2,161.8L670.2,170.0L670.2,173.5L670.2,174.9L670.2,186.7L670.1,190.2L670.1,190.4L593.6,190.1L593.6,184.8L593.6,184.7L593.6,183.7L593.6,183.4L593.6,183.2L593.6,182.5L593.6,182.4L593.6,176.0L593.6,174.8L605.1,174.9L605.0,149.0L633.7,149.0L670.2,149.1Z"/><path id="c-Marion" data-name="Marion" d="M278.7,228.0L294.3,225.4L320.4,225.2L354.5,224.8L354.3,235.2L341.1,235.4L341.0,262.7L332.6,272.8L301.8,271.0L301.9,259.8L278.9,260.1L279.3,258.3L278.7,228.0Z"/><path id="c-Athens" data-name="Athens" d="M462.8,444.8L491.3,446.5L490.1,469.9L507.9,478.4L507.9,488.5L505.4,492.4L504.1,493.1L504.1,494.1L434.1,490.1L434.7,481.3L434.8,481.2L434.8,480.9L434.8,480.8L435.2,474.3L430.1,474.0L431.3,458.2L432.5,442.5L447.8,443.7L448.9,427.7L463.9,428.8L462.8,444.8Z"/><path id="c-Champaign" data-name="Champaign" d="M261.0,308.9L268.6,309.6L267.4,329.7L265.7,347.6L195.5,342.3L197.3,316.9L198.4,301.1L261.0,308.9Z"/><path id="c-Coshocton" data-name="Coshocton" d="M445.1,319.9L445.7,307.2L443.9,307.2L445.5,269.1L445.4,268.8L509.6,270.8L509.2,283.9L522.2,284.4L521.3,310.3L508.6,322.5L508.6,322.4L445.1,319.9Z"/><path id="c-Fairfield" data-name="Fairfield" d="M359.1,385.6L360.8,361.3L360.9,359.8L364.7,360.1L391.8,361.7L406.5,362.6L407.9,361.7L406.6,378.2L416.8,378.9L419.8,410.4L404.2,409.2L403.4,419.6L387.0,418.5L386.7,426.4L371.6,428.1L356.6,426.9L359.1,385.6Z"/><path id="c-Guernsey" data-name="Guernsey" d="M511.6,377.2L507.0,361.5L508.6,322.5L521.3,310.3L559.7,311.5L559.5,319.0L574.8,319.3L573.7,358.0L553.2,358.1L542.7,368.0L527.2,367.5L527.0,377.8L511.6,377.2Z"/><path id="c-Henry" data-name="Henry" d="M169.6,143.4L169.6,97.1L154.3,97.2L154.3,86.9L216.2,86.6L216.2,99.5L216.5,143.1L169.6,143.4Z"/><path id="c-Knox" data-name="Knox" d="M421.2,306.8L406.1,302.6L369.0,300.5L369.1,299.2L369.1,298.4L369.8,287.6L383.1,288.4L386.2,252.2L419.8,252.1L424.9,251.3L440.6,249.0L446.2,248.1L445.4,268.8L445.5,269.1L443.9,307.2L426.3,307.0L421.2,306.8Z"/><path id="c-Logan" data-name="Logan" d="M261.0,308.9L198.4,301.1L200.1,264.0L201.2,254.8L216.6,254.2L265.2,260.3L261.0,308.9Z"/><path id="c-Medina" data-name="Medina" d="M473.9,137.4L474.1,124.2L480.2,124.2L481.1,124.1L481.9,124.0L483.0,124.1L484.1,124.1L486.8,124.1L512.9,123.7L512.8,137.0L512.4,174.7L452.9,174.2L447.0,174.1L447.2,161.5L447.4,148.5L460.3,148.6L460.6,137.4L473.9,137.4Z"/><path id="c-Morgan" data-name="Morgan" d="M491.3,446.5L462.8,444.8L463.9,428.8L467.1,398.0L460.0,389.9L511.2,392.6L519.0,393.0L518.5,408.5L526.2,408.8L525.9,422.4L508.9,422.9L509.7,441.1L494.2,438.8L491.3,446.5Z"/><path id="c-Perry" data-name="Perry" d="M460.0,389.9L467.1,398.0L463.9,428.8L448.9,427.7L419.1,420.6L419.8,410.4L416.8,378.9L406.6,378.2L407.9,361.7L438.8,364.7L448.4,365.4L447.4,381.1L460.5,381.9L460.0,389.9Z"/><path id="c-Putnam" data-name="Putnam" d="M154.3,143.5L169.6,143.4L216.5,143.1L216.6,186.8L185.6,189.5L185.6,197.3L154.5,197.6L146.6,189.8L146.5,174.4L154.3,174.4L154.3,143.5Z"/><path id="c-Summit" data-name="Summit" d="M525.6,123.7L524.6,110.7L525.3,110.7L544.5,111.0L551.4,111.1L552.5,111.2L552.5,112.4L552.4,113.2L552.5,114.1L552.4,123.8L552.4,148.5L552.4,148.7L552.2,174.7L548.6,189.2L542.2,189.0L518.1,187.9L517.9,187.8L512.4,174.7L512.8,137.0L512.9,123.7L525.6,123.7Z"/><path id="c-Warren" data-name="Warren" d="M202.0,447.6L199.5,481.0L165.4,478.2L152.7,474.4L153.4,464.5L155.6,429.1L151.1,421.9L175.1,423.1L185.0,424.0L203.5,425.5L202.0,447.6Z"/><path id="c-Lake" data-name="Lake" d="M552.5,72.1L550.1,72.0L549.0,72.1L548.6,72.0L539.5,72.0L539.4,70.7L539.4,67.0L539.3,61.8L539.4,61.2L539.6,60.9L540.9,59.6L542.4,58.0L544.3,55.5L544.9,54.7L545.4,53.9L545.6,53.8L545.6,53.7L545.7,53.7L545.8,53.6L546.1,53.4L546.2,53.2L546.3,53.1L546.5,53.0L547.1,52.5L549.6,50.5L550.3,49.9L550.5,49.7L550.7,49.5L551.0,49.3L551.2,49.1L552.9,47.8L552.9,47.7L553.9,47.0L554.8,46.3L554.9,46.2L555.0,46.1L555.5,45.7L555.6,45.7L555.7,45.6L557.6,44.1L560.8,42.3L563.5,40.7L563.9,40.5L564.0,40.5L564.6,40.1L566.3,38.6L566.6,38.4L567.5,38.4L567.6,38.5L569.5,38.7L569.7,38.8L569.7,38.7L569.8,38.7L570.3,38.6L570.8,38.4L571.2,38.4L571.3,38.3L571.8,38.2L571.9,38.1L578.0,35.0L578.1,34.9L579.3,34.3L580.4,33.7L580.6,33.6L582.7,32.4L588.8,29.0L590.1,28.3L592.0,27.6L592.4,27.4L592.8,27.3L598.3,24.4L602.0,23.2L603.9,21.8L605.0,21.7L604.7,44.4L604.8,46.4L591.5,46.5L591.6,59.4L565.5,59.5L565.4,72.0L552.5,72.1Z"/><path id="c-Lucas" data-name="Lucas" d="M274.1,43.3L273.9,44.2L274.8,47.1L275.2,47.8L280.1,50.6L282.4,50.5L284.7,51.4L287.2,51.2L289.2,50.2L289.8,49.3L289.8,48.4L291.3,48.8L295.1,51.9L295.5,52.2L295.7,52.4L296.2,53.1L296.3,53.2L296.4,53.3L296.6,53.4L296.9,53.5L297.8,54.0L303.2,57.7L304.1,58.9L309.1,61.2L313.0,62.6L279.2,63.4L258.5,63.7L240.5,79.3L239.2,85.6L216.2,99.5L216.2,86.6L216.3,66.1L216.6,45.5L232.4,44.8L242.9,44.4L245.5,44.3L249.1,44.1L249.5,44.1L255.0,43.9L255.2,43.9L256.4,43.8L267.3,43.5L267.4,43.5L267.9,43.4L268.2,43.4L274.1,43.3Z"/><path id="c-Monroe" data-name="Monroe" d="M630.6,376.1L628.5,398.7L628.3,400.3L628.0,401.4L621.5,416.4L619.9,417.1L612.9,418.8L602.6,427.9L600.1,430.6L600.4,425.0L572.0,423.8L567.1,419.0L562.2,401.1L563.0,372.5L573.3,372.7L630.6,376.1Z"/><path id="c-Montgomery" data-name="Montgomery" d="M179.2,369.6L179.6,369.6L186.3,370.1L187.2,370.2L192.8,370.6L193.5,370.6L193.4,371.0L193.4,373.0L193.2,374.8L193.2,375.0L193.2,375.8L193.0,378.4L187.9,378.0L187.3,386.0L185.0,424.0L175.1,423.1L151.1,421.9L136.4,421.8L135.7,421.7L134.9,363.8L139.9,363.7L140.1,363.7L140.2,363.7L142.9,363.6L179.1,363.0L179.2,369.6Z"/><path id="c-Ottawa" data-name="Ottawa" d="M359.0,56.2L361.2,55.8L361.7,55.3L362.9,55.0L363.3,55.3L363.2,55.7L362.7,56.4L358.7,60.7L357.7,61.5L356.7,61.7L356.5,58.4L357.8,56.6L359.0,56.2ZM361.9,50.1L364.2,49.5L364.7,50.1L363.7,50.8L362.2,52.1L361.7,53.5L361.6,54.0L360.5,54.2L358.8,51.7L360.6,50.4L361.9,50.1ZM360.6,44.9L361.0,45.4L361.2,47.6L360.2,47.8L357.6,47.4L357.6,47.1L358.0,46.3L358.9,45.0L359.6,44.7L360.6,44.9ZM358.6,87.6L354.8,89.3L348.0,91.4L346.1,91.7L341.8,91.7L289.7,91.9L279.4,84.3L279.2,63.4L313.0,62.6L315.7,63.5L321.4,64.3L323.8,65.5L326.4,67.5L328.9,71.3L329.5,72.3L329.6,72.4L331.1,74.0L331.2,74.1L331.6,74.5L332.8,75.5L333.0,75.7L333.1,75.8L335.4,77.6L339.5,80.1L341.0,80.6L344.2,81.8L349.2,81.0L349.3,80.9L350.5,80.4L351.3,79.8L352.2,79.1L353.0,78.4L353.4,77.7L354.1,76.8L354.6,76.1L354.7,75.8L354.7,75.4L354.9,73.0L354.8,72.6L354.7,72.3L354.5,71.3L354.3,70.9L354.6,70.6L354.6,70.5L354.7,70.4L355.1,69.9L355.2,69.6L355.9,69.2L357.8,68.9L359.6,71.9L363.1,76.2L364.3,77.2L366.2,77.2L369.1,76.2L370.5,76.4L371.4,76.6L371.6,76.6L371.8,76.6L372.0,76.7L372.1,76.7L372.9,76.9L373.1,76.9L373.5,77.0L373.8,77.3L374.3,77.8L374.4,77.9L374.4,78.0L374.3,79.6L373.6,80.4L372.9,81.4L373.2,82.5L373.2,82.6L374.0,84.1L374.5,84.8L376.6,85.4L358.6,87.6Z"/><path id="c-Scioto" data-name="Scioto" d="M329.5,533.7L361.4,535.3L368.7,535.7L367.7,551.7L382.6,552.7L375.0,583.1L367.2,582.6L370.4,597.3L360.2,601.9L359.7,601.6L357.0,599.2L356.0,597.6L355.1,594.8L353.0,582.9L352.5,577.3L352.9,575.2L352.9,573.7L352.8,572.1L352.3,571.1L352.2,570.7L351.6,570.0L350.3,569.2L349.7,569.1L345.7,570.2L343.1,571.4L339.6,574.0L338.2,574.5L333.8,573.8L331.2,574.5L331.2,574.6L318.2,589.3L317.2,591.2L316.1,592.3L314.2,593.1L299.5,595.8L298.8,523.3L306.8,533.1L329.5,533.7Z"/><path id="c-Trumbull" data-name="Trumbull" d="M670.2,112.5L670.2,112.6L670.2,112.7L670.2,112.8L670.2,113.1L670.2,113.4L670.2,113.8L670.2,117.5L670.3,118.7L670.2,125.3L670.3,125.9L670.3,128.7L670.3,131.6L670.3,134.0L670.3,135.7L670.2,142.5L670.2,147.0L670.2,149.1L633.7,149.0L605.0,149.0L604.9,124.7L604.9,111.3L604.9,97.7L604.9,97.5L604.9,84.1L670.2,84.4L670.2,86.3L670.2,91.0L670.2,95.8L670.2,99.1L670.2,105.8L670.2,107.0L670.2,108.9L670.2,110.7L670.2,112.5Z"/><path id="c-Vinton" data-name="Vinton" d="M431.3,458.2L430.1,474.0L435.2,474.3L434.8,480.8L434.8,480.9L434.8,481.2L434.7,481.3L434.1,490.1L429.0,489.8L426.8,521.2L411.6,519.9L413.0,501.7L398.0,494.1L367.4,489.3L369.3,461.0L400.5,460.8L400.9,456.2L431.3,458.2Z"/><path id="c-Ashtabula" data-name="Ashtabula" d="M608.9,21.1L609.2,21.0L610.9,20.8L613.9,20.3L616.6,19.7L618.8,19.2L625.1,16.4L625.3,16.3L628.7,14.8L629.7,14.4L630.1,14.2L630.3,14.1L630.5,13.9L630.6,13.9L631.1,13.4L631.2,13.3L631.5,13.0L632.1,12.1L632.2,12.0L632.3,12.0L632.5,11.9L633.1,11.9L634.1,11.7L634.3,11.7L634.4,11.7L634.6,12.2L634.7,12.5L634.9,12.5L635.4,12.3L636.1,12.0L636.3,12.0L636.6,11.8L636.9,11.7L637.4,11.5L638.0,11.3L642.1,10.4L643.0,10.2L643.5,10.0L644.2,9.8L644.7,9.6L645.9,9.2L646.7,8.9L654.5,6.1L656.7,5.3L658.1,4.8L661.8,3.5L662.1,3.4L662.4,3.2L662.5,3.2L662.6,3.1L663.1,2.9L664.3,2.3L664.6,2.2L665.3,1.8L665.5,1.7L668.2,0.7L668.6,0.6L668.7,0.5L668.9,0.5L669.4,0.3L669.8,0.1L670.2,0.0L670.2,0.2L670.2,5.9L670.2,8.5L670.2,22.6L670.2,37.5L670.2,39.8L670.2,42.1L670.2,48.8L670.2,54.1L670.2,54.4L670.2,77.4L670.2,79.3L670.2,84.4L604.9,84.1L604.9,49.0L604.8,46.4L604.7,44.4L605.0,21.7L606.4,21.5L608.9,21.1Z"/><path id="c-Cuyahoga" data-name="Cuyahoga" d="M486.8,124.1L486.9,112.0L474.2,110.6L474.7,83.2L475.1,83.4L475.4,84.1L476.0,84.6L478.7,85.9L479.7,86.1L480.0,86.1L486.9,87.3L489.2,87.2L490.6,86.8L492.3,86.2L492.5,86.2L495.9,85.1L497.2,85.0L497.3,85.0L497.4,85.0L498.1,85.0L499.7,85.1L501.5,85.8L502.4,86.1L502.9,86.2L504.6,86.6L504.7,86.6L504.8,86.6L504.9,86.6L505.2,86.5L505.6,86.4L506.4,85.9L507.1,85.5L507.3,85.4L507.4,85.3L508.2,84.8L508.6,84.6L508.7,84.5L509.4,84.1L509.8,83.5L509.9,83.3L511.8,81.9L512.0,81.7L512.5,81.3L515.6,78.8L517.6,78.0L517.8,78.0L518.8,77.6L519.8,77.2L520.6,76.6L522.1,75.5L522.1,75.4L522.2,75.3L523.0,74.8L523.0,74.7L524.4,73.7L525.3,72.8L525.4,72.7L525.5,72.6L527.1,71.1L527.1,71.0L527.2,70.9L527.4,70.8L527.6,70.6L527.6,70.5L529.4,68.9L533.6,64.4L533.8,64.2L533.8,64.1L534.2,64.0L535.0,63.6L536.6,63.0L537.8,62.6L539.4,61.2L539.3,61.8L539.4,67.0L539.4,70.7L539.5,72.0L548.6,72.0L549.0,72.1L550.1,72.0L552.5,72.1L552.5,111.2L551.4,111.1L544.5,111.0L525.3,110.7L524.6,110.7L525.6,123.7L512.9,123.7L486.8,124.1Z"/><path id="c-Fulton" data-name="Fulton" d="M216.6,45.5L216.3,66.1L216.2,86.6L154.3,86.9L149.0,81.9L146.5,48.0L146.9,48.0L151.8,47.8L216.5,45.5L216.6,45.5Z"/><path id="c-Gallia" data-name="Gallia" d="M451.6,549.7L445.5,558.5L444.5,558.7L441.2,561.9L440.4,563.7L440.6,566.1L443.5,568.9L444.9,573.1L445.7,577.5L447.1,592.2L447.1,593.3L446.7,595.3L446.4,596.1L445.8,596.9L444.2,598.0L440.8,598.2L437.2,597.0L435.0,597.1L433.3,597.9L431.6,599.8L421.5,599.4L422.5,583.3L406.6,582.2L405.1,566.3L391.7,565.1L392.7,553.6L408.9,553.5L411.6,519.9L426.8,521.2L457.5,525.6L457.0,533.5L451.6,549.7Z"/><path id="c-Harrison" data-name="Harrison" d="M600.5,320.3L574.8,319.3L559.5,319.0L559.7,311.5L560.2,295.6L568.2,295.8L568.9,272.8L613.2,274.4L623.5,274.7L621.1,321.2L600.5,320.3Z"/><path id="c-Hocking" data-name="Hocking" d="M419.8,410.4L419.1,420.6L448.9,427.7L447.8,443.7L432.5,442.5L431.3,458.2L400.9,456.2L400.5,460.8L369.3,461.0L370.4,443.7L370.4,443.3L371.6,428.1L386.7,426.4L387.0,418.5L403.4,419.6L404.2,409.2L419.8,410.4Z"/><path id="c-Jackson" data-name="Jackson" d="M364.3,496.3L366.9,496.4L367.4,489.3L398.0,494.1L413.0,501.7L411.6,519.9L408.9,553.5L392.7,553.6L386.0,553.0L385.9,553.0L382.6,552.7L367.7,551.7L368.7,535.7L361.4,535.3L364.3,496.3Z"/><path id="c-Greene" data-name="Greene" d="M187.3,386.0L187.9,378.0L193.0,378.4L193.2,375.8L223.7,380.7L223.4,385.1L248.0,389.5L247.8,390.3L247.8,391.6L247.2,399.4L244.9,428.9L203.5,425.5L185.0,424.0L187.3,386.0Z"/></g>
+      <g id="labels"></g>
+      <g id="lines"></g>
+    </svg>
+  </div>
+  <div class="rightcol">
+    <div class="panel" id="panel"></div>
+    <div class="panel" id="statepanel"></div>
+  </div>
+</div>
+<footer class="foot">tax year 2025 &middot; county totals only, no names on the map &middot; dollars are county figures or estimates</footer>
+</div>
+<script>
+const DATA={"counties":{"Adams":{"claimants":3507,"dollars":123907,"entity":10,"entity_usd":369,"incounty":33,"incounty_usd":753,"cross":25,"cross_usd":9,"flagOnly":false,"roll":0,"dl":"data/Adams.csv","dlx":"data/Adams.xlsx","dlrows":353},"Allen":{"claimants":24211,"dollars":0,"entity":118,"entity_usd":0,"incounty":248,"incounty_usd":11403,"cross":90,"cross_usd":0,"flagOnly":true,"roll":0,"dl":"data/Allen.csv","dlx":"data/Allen.xlsx","dlrows":2130},"Ashtabula":{"claimants":24635,"dollars":1098275,"entity":256,"entity_usd":10031,"incounty":345,"incounty_usd":10069,"cross":139,"cross_usd":748,"flagOnly":false,"roll":0,"dl":"data/Ashtabula.csv","dlx":"data/Ashtabula.xlsx","dlrows":2495},"Athens":{"claimants":10849,"dollars":572104,"entity":144,"entity_usd":7236,"incounty":107,"incounty_usd":2694,"cross":44,"cross_usd":730,"flagOnly":false,"roll":0,"dl":"data/Athens.csv","dlx":"data/Athens.xlsx","dlrows":1163},"Brown":{"claimants":4306,"dollars":207722,"entity":23,"entity_usd":1087,"incounty":26,"incounty_usd":847,"cross":82,"cross_usd":49,"flagOnly":false,"roll":0,"dl":"data/Brown.csv","dlx":"data/Brown.xlsx","dlrows":414},"Clinton":{"claimants":7684,"dollars":421844,"entity":29,"entity_usd":1175,"incounty":69,"incounty_usd":1569,"cross":111,"cross_usd":46,"flagOnly":false,"roll":0,"dl":"data/Clinton.csv","dlx":"data/Clinton.xlsx","dlrows":754},"Coshocton":{"claimants":6316,"dollars":268910,"entity":75,"entity_usd":3371,"incounty":89,"incounty_usd":2733,"cross":66,"cross_usd":275,"flagOnly":false,"roll":0,"dl":"data/Coshocton.csv","dlx":"data/Coshocton.xlsx","dlrows":767},"Cuyahoga":{"claimants":315159,"dollars":0,"entity":7164,"entity_usd":0,"incounty":10026,"incounty_usd":719586,"cross":2462,"cross_usd":615,"flagOnly":true,"roll":201500,"dl":"data/Cuyahoga.csv","dlx":"data/Cuyahoga.xlsx","dlrows":45957},"Delaware":{"claimants":63868,"dollars":0,"entity":1120,"entity_usd":0,"incounty":564,"incounty_usd":76503,"cross":373,"cross_usd":1062,"flagOnly":true,"roll":0,"dl":"data/Delaware.csv","dlx":"data/Delaware.xlsx","dlrows":6165},"Erie":{"claimants":13667,"dollars":873498,"entity":257,"entity_usd":21556,"incounty":89,"incounty_usd":3853,"cross":103,"cross_usd":2176,"flagOnly":false,"roll":0,"dl":"data/Erie.csv","dlx":"data/Erie.xlsx","dlrows":1276},"Fairfield":{"claimants":42293,"dollars":4279162,"entity":498,"entity_usd":43730,"incounty":286,"incounty_usd":16778,"cross":281,"cross_usd":8517,"flagOnly":false,"roll":0,"dl":"data/Fairfield.csv","dlx":"data/Fairfield.xlsx","dlrows":4196},"Fayette":{"claimants":5050,"dollars":308969,"entity":62,"entity_usd":4075,"incounty":41,"incounty_usd":2112,"cross":51,"cross_usd":307,"flagOnly":false,"roll":0,"dl":"data/Fayette.csv","dlx":"data/Fayette.xlsx","dlrows":577},"Franklin":{"claimants":288342,"dollars":35505739,"entity":3022,"entity_usd":345812,"incounty":4057,"incounty_usd":334525,"cross":1330,"cross_usd":18816,"flagOnly":false,"roll":0,"dl":"data/Franklin.csv","dlx":"data/Franklin.xlsx","dlrows":21371},"Geauga":{"claimants":22053,"dollars":2743089,"entity":443,"entity_usd":71912,"incounty":204,"incounty_usd":15532,"cross":310,"cross_usd":1022,"flagOnly":false,"roll":0,"dl":"data/Geauga.csv","dlx":"data/Geauga.xlsx","dlrows":1997},"Guernsey":{"claimants":5788,"dollars":253978,"entity":59,"entity_usd":2855,"incounty":32,"incounty_usd":917,"cross":69,"cross_usd":118,"flagOnly":false,"roll":0,"dl":"data/Guernsey.csv","dlx":"data/Guernsey.xlsx","dlrows":600},"Hamilton":{"claimants":193067,"dollars":0,"entity":1928,"entity_usd":0,"incounty":3564,"incounty_usd":278627,"cross":874,"cross_usd":46,"flagOnly":true,"roll":0,"dl":"data/Hamilton.csv","dlx":"data/Hamilton.xlsx","dlrows":18233},"Huron":{"claimants":12091,"dollars":591618,"entity":129,"entity_usd":7859,"incounty":210,"incounty_usd":4484,"cross":38,"cross_usd":776,"flagOnly":false,"roll":0,"dl":"data/Huron.csv","dlx":"data/Huron.xlsx","dlrows":1331},"Knox":{"claimants":13188,"dollars":861130,"entity":248,"entity_usd":18763,"incounty":108,"incounty_usd":5147,"cross":79,"cross_usd":689,"flagOnly":false,"roll":0,"dl":"data/Knox.csv","dlx":"data/Knox.xlsx","dlrows":1417},"Lorain":{"claimants":70310,"dollars":6763419,"entity":455,"entity_usd":35753,"incounty":2585,"incounty_usd":53873,"cross":401,"cross_usd":1778,"flagOnly":false,"roll":0,"dl":"data/Lorain.csv","dlx":"data/Lorain.xlsx","dlrows":9795},"Madison":{"claimants":8027,"dollars":626195,"entity":104,"entity_usd":9377,"incounty":15,"incounty_usd":748,"cross":64,"cross_usd":999,"flagOnly":false,"roll":0,"dl":"data/Madison.csv","dlx":"data/Madison.xlsx","dlrows":627},"Mahoning":{"claimants":64815,"dollars":0,"entity":275,"entity_usd":0,"incounty":605,"incounty_usd":72202,"cross":228,"cross_usd":0,"flagOnly":true,"roll":0,"dl":"data/Mahoning.csv","dlx":"data/Mahoning.xlsx","dlrows":5278},"Medina":{"claimants":56847,"dollars":0,"entity":301,"entity_usd":0,"incounty":590,"incounty_usd":56116,"cross":809,"cross_usd":35,"flagOnly":true,"roll":0,"dl":"data/Medina.csv","dlx":"data/Medina.xlsx","dlrows":4386},"Morgan":{"claimants":1987,"dollars":65379,"entity":29,"entity_usd":787,"incounty":28,"incounty_usd":452,"cross":40,"cross_usd":260,"flagOnly":false,"roll":0,"dl":"data/Morgan.csv","dlx":"data/Morgan.xlsx","dlrows":275},"Ottawa":{"claimants":5892,"dollars":429152,"entity":51,"entity_usd":6346,"incounty":22,"incounty_usd":913,"cross":105,"cross_usd":1434,"flagOnly":false,"roll":0,"dl":"data/Ottawa.csv","dlx":"data/Ottawa.xlsx","dlrows":430},"Pickaway":{"claimants":14461,"dollars":0,"entity":410,"entity_usd":0,"incounty":437,"incounty_usd":8493,"cross":93,"cross_usd":402,"flagOnly":true,"roll":0,"dl":"data/Pickaway.csv","dlx":"data/Pickaway.xlsx","dlrows":2503},"Portage":{"claimants":40696,"dollars":0,"entity":123,"entity_usd":0,"incounty":514,"incounty_usd":41898,"cross":517,"cross_usd":98,"flagOnly":true,"roll":0,"dl":"data/Portage.csv","dlx":"data/Portage.xlsx","dlrows":3603},"Trumbull":{"claimants":45486,"dollars":0,"entity":212,"entity_usd":0,"incounty":744,"incounty_usd":28675,"cross":159,"cross_usd":73,"flagOnly":true,"roll":0,"dl":"data/Trumbull.csv","dlx":"data/Trumbull.xlsx","dlrows":4553},"Union":{"claimants":18907,"dollars":2743831,"entity":215,"entity_usd":27870,"incounty":157,"incounty_usd":13165,"cross":179,"cross_usd":5361,"flagOnly":false,"roll":0,"dl":"data/Union.csv","dlx":"data/Union.xlsx","dlrows":1689},"Washington":{"claimants":15642,"dollars":828487,"entity":223,"entity_usd":14144,"incounty":349,"incounty_usd":8694,"cross":35,"cross_usd":367,"flagOnly":false,"roll":0,"dl":"data/Washington.csv","dlx":"data/Washington.xlsx","dlrows":2023},"Belmont":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":284,"cross_usd":57,"flagOnly":false,"roll":64192,"dl":"data/Belmont.csv","dlx":"data/Belmont.xlsx","dlrows":3857},"Butler":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":1040,"cross_usd":46,"flagOnly":false,"roll":167087,"dl":"data/Butler.csv","dlx":"data/Butler.xlsx","dlrows":8505},"Carroll":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":1303,"cross_usd":24,"flagOnly":false,"roll":31137,"dl":"data/Carroll.csv","dlx":"data/Carroll.xlsx","dlrows":1740},"Champaign":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":0,"cross_usd":0,"flagOnly":false,"roll":25353,"dl":"data/Champaign.csv","dlx":"data/Champaign.xlsx","dlrows":1921},"Clark":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":613,"cross_usd":39,"flagOnly":false,"roll":65606,"dl":"data/Clark.csv","dlx":"data/Clark.xlsx","dlrows":3982},"Clermont":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":798,"cross_usd":0,"flagOnly":false,"roll":97683,"dl":"data/Clermont.csv","dlx":"data/Clermont.xlsx","dlrows":5891},"Columbiana":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":388,"cross_usd":46,"flagOnly":false,"roll":74172,"dl":"data/Columbiana.csv","dlx":"data/Columbiana.xlsx","dlrows":4862},"Greene":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":1152,"cross_usd":0,"flagOnly":false,"roll":77489,"dl":"data/Greene.csv","dlx":"data/Greene.xlsx","dlrows":4353},"Harrison":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":4,"cross_usd":0,"flagOnly":false,"roll":17547,"dl":"data/Harrison.csv","dlx":"data/Harrison.xlsx","dlrows":1277},"Highland":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":463,"cross_usd":67,"flagOnly":false,"roll":31918,"dl":"data/Highland.csv","dlx":"data/Highland.xlsx","dlrows":2642},"Holmes":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":552,"cross_usd":0,"flagOnly":false,"roll":28714,"dl":"data/Holmes.csv","dlx":"data/Holmes.xlsx","dlrows":3505},"Lake":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":730,"cross_usd":63,"flagOnly":false,"roll":112823,"dl":"data/Lake.csv","dlx":"data/Lake.xlsx","dlrows":5415},"Licking":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":645,"cross_usd":563,"flagOnly":false,"roll":97065,"dl":"data/Licking.csv","dlx":"data/Licking.xlsx","dlrows":4802},"Logan":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":750,"cross_usd":456,"flagOnly":false,"roll":36886,"dl":"data/Logan.csv","dlx":"data/Logan.xlsx","dlrows":2478},"Lucas":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":145,"cross_usd":99,"flagOnly":false,"roll":138114,"dl":"data/Lucas.csv","dlx":"data/Lucas.xlsx","dlrows":6914},"Montgomery":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":1500,"cross_usd":60,"flagOnly":false,"roll":254611,"dl":"data/Montgomery.csv","dlx":"data/Montgomery.xlsx","dlrows":12830},"Muskingum":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":529,"cross_usd":304,"flagOnly":false,"roll":57262,"dl":"data/Muskingum.csv","dlx":"data/Muskingum.xlsx","dlrows":3862},"Seneca":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":4,"cross_usd":0,"flagOnly":false,"roll":34573,"dl":"data/Seneca.csv","dlx":"data/Seneca.xlsx","dlrows":1816},"Stark":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":1882,"cross_usd":46,"flagOnly":false,"roll":201677,"dl":"data/Stark.csv","dlx":"data/Stark.xlsx","dlrows":10175},"Summit":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":2176,"cross_usd":0,"flagOnly":false,"roll":260169,"dl":"data/Summit.csv","dlx":"data/Summit.xlsx","dlrows":11365},"Warren":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":1048,"cross_usd":0,"flagOnly":false,"roll":89965,"dl":"data/Warren.csv","dlx":"data/Warren.xlsx","dlrows":4150},"Wayne":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":794,"cross_usd":117,"flagOnly":false,"roll":57178,"dl":"data/Wayne.csv","dlx":"data/Wayne.xlsx","dlrows":3388},"Williams":{"claimants":0,"dollars":0,"entity":0,"entity_usd":0,"incounty":0,"incounty_usd":0,"cross":3,"cross_usd":0,"flagOnly":false,"roll":1286,"dl":"data/Williams.csv","dlx":"data/Williams.xlsx","dlrows":61}},"links":[["Adams","Butler",1],["Adams","Clark",1],["Adams","Clermont",6],["Adams","Fayette",1],["Adams","Highland",11],["Adams","Montgomery",3],["Adams","Warren",2],["Allen","Athens",1],["Allen","Belmont",2],["Allen","Carroll",1],["Allen","Clermont",2],["Allen","Columbiana",1],["Allen","Cuyahoga",1],["Allen","Franklin",2],["Allen","Greene",1],["Allen","Holmes",2],["Allen","Licking",1],["Allen","Logan",67],["Allen","Lucas",2],["Allen","Montgomery",3],["Allen","Muskingum",2],["Allen","Summit",2],["Allen","Warren",1],["Ashtabula","Carroll",1],["Ashtabula","Columbiana",3],["Ashtabula","Cuyahoga",26],["Ashtabula","Franklin",4],["Ashtabula","Geauga",10],["Ashtabula","Hamilton",1],["Ashtabula","Lake",47],["Ashtabula","Lorain",2],["Ashtabula","Lucas",2],["Ashtabula","Mahoning",4],["Ashtabula","Medina",4],["Ashtabula","Portage",4],["Ashtabula","Summit",10],["Ashtabula","Trumbull",21],["Athens","Butler",1],["Athens","Carroll",2],["Athens","Clermont",1],["Athens","Clinton",1],["Athens","Columbiana",2],["Athens","Cuyahoga",4],["Athens","Delaware",4],["Athens","Fayette",1],["Athens","Franklin",7],["Athens","Hamilton",1],["Athens","Highland",1],["Athens","Licking",2],["Athens","Lucas",1],["Athens","Montgomery",1],["Athens","Morgan",5],["Athens","Muskingum",3],["Athens","Pickaway",1],["Athens","Portage",1],["Athens","Stark",3],["Athens","Summit",2],["Athens","Trumbull",1],["Athens","Washington",5],["Belmont","Butler",1],["Belmont","Carroll",15],["Belmont","Clermont",3],["Belmont","Columbiana",4],["Belmont","Coshocton",1],["Belmont","Cuyahoga",28],["Belmont","Delaware",10],["Belmont","Fairfield",13],["Belmont","Fayette",2],["Belmont","Franklin",19],["Belmont","Geauga",1],["Belmont","Greene",4],["Belmont","Guernsey",20],["Belmont","Hamilton",1],["Belmont","Harrison",2],["Belmont","Highland",1],["Belmont","Holmes",4],["Belmont","Knox",1],["Belmont","Lake",7],["Belmont","Licking",16],["Belmont","Lorain",2],["Belmont","Lucas",1],["Belmont","Madison",1],["Belmont","Mahoning",4],["Belmont","Medina",13],["Belmont","Montgomery",5],["Belmont","Muskingum",14],["Belmont","Pickaway",1],["Belmont","Portage",13],["Belmont","Stark",41],["Belmont","Summit",32],["Belmont","Trumbull",5],["Belmont","Union",3],["Belmont","Warren",1],["Belmont","Washington",3],["Belmont","Wayne",19],["Brown","Butler",2],["Brown","Clark",1],["Brown","Clermont",56],["Brown","Franklin",1],["Brown","Greene",1],["Brown","Hamilton",2],["Brown","Highland",20],["Brown","Warren",1],["Butler","Carroll",1],["Butler","Clark",14],["Butler","Clermont",95],["Butler","Clinton",3],["Butler","Columbiana",2],["Butler","Cuyahoga",15],["Butler","Delaware",6],["Butler","Fairfield",1],["Butler","Fayette",2],["Butler","Franklin",13],["Butler","Geauga",2],["Butler","Greene",27],["Butler","Hamilton",238],["Butler","Highland",36],["Butler","Holmes",1],["Butler","Licking",10],["Butler","Logan",15],["Butler","Lucas",4],["Butler","Montgomery",208],["Butler","Muskingum",3],["Butler","Pickaway",1],["Butler","Portage",1],["Butler","Stark",5],["Butler","Summit",12],["Butler","Union",1],["Butler","Warren",390],["Butler","Wayne",3],["Carroll","Columbiana",82],["Carroll","Coshocton",2],["Carroll","Cuyahoga",96],["Carroll","Delaware",3],["Carroll","Fairfield",3],["Carroll","Franklin",16],["Carroll","Geauga",11],["Carroll","Greene",1],["Carroll","Hamilton",1],["Carroll","Harrison",1],["Carroll","Highland",1],["Carroll","Holmes",14],["Carroll","Huron",1],["Carroll","Knox",3],["Carroll","Lake",4],["Carroll","Licking",7],["Carroll","Lorain",13],["Carroll","Lucas",1],["Carroll","Mahoning",7],["Carroll","Medina",36],["Carroll","Montgomery",2],["Carroll","Muskingum",8],["Carroll","Pickaway",1],["Carroll","Portage",35],["Carroll","Stark",723],["Carroll","Summit",182],["Carroll","Trumbull",2],["Carroll","Union",4],["Carroll","Warren",3],["Carroll","Washington",2],["Carroll","Wayne",66],["Clark","Clermont",5],["Clark","Cuyahoga",5],["Clark","Delaware",13],["Clark","Fairfield",3],["Clark","Fayette",1],["Clark","Franklin",57],["Clark","Greene",244],["Clark","Hamilton",4],["Clark","Highland",19],["Clark","Holmes",1],["Clark","Lake",1],["Clark","Licking",7],["Clark","Logan",95],["Clark","Lorain",1],["Clark","Lucas",4],["Clark","Madison",21],["Clark","Montgomery",132],["Clark","Muskingum",5],["Clark","Stark",3],["Clark","Summit",4],["Clark","Union",7],["Clark","Warren",5],["Clermont","Clinton",18],["Clermont","Columbiana",1],["Clermont","Cuyahoga",4],["Clermont","Delaware",2],["Clermont","Fairfield",1],["Clermont","Franklin",5],["Clermont","Greene",7],["Clermont","Hamilton",369],["Clermont","Highland",63],["Clermont","Huron",1],["Clermont","Lake",2],["Clermont","Licking",5],["Clermont","Logan",7],["Clermont","Lucas",6],["Clermont","Mahoning",2],["Clermont","Montgomery",17],["Clermont","Muskingum",2],["Clermont","Pickaway",1],["Clermont","Stark",1],["Clermont","Summit",2],["Clermont","Trumbull",1],["Clermont","Union",1],["Clermont","Warren",159],["Clermont","Wayne",2],["Clinton","Columbiana",1],["Clinton","Cuyahoga",1],["Clinton","Greene",27],["Clinton","Hamilton",4],["Clinton","Highland",34],["Clinton","Lucas",1],["Clinton","Montgomery",6],["Clinton","Muskingum",1],["Clinton","Portage",1],["Clinton","Stark",1],["Clinton","Warren",26],["Columbiana","Cuyahoga",18],["Columbiana","Delaware",1],["Columbiana","Fairfield",2],["Columbiana","Franklin",1],["Columbiana","Geauga",3],["Columbiana","Greene",1],["Columbiana","Guernsey",1],["Columbiana","Hamilton",1],["Columbiana","Holmes",3],["Columbiana","Huron",1],["Columbiana","Lake",3],["Columbiana","Licking",2],["Columbiana","Logan",2],["Columbiana","Lucas",2],["Columbiana","Mahoning",96],["Columbiana","Medina",4],["Columbiana","Montgomery",5],["Columbiana","Muskingum",4],["Columbiana","Portage",7],["Columbiana","Stark",121],["Columbiana","Summit",22],["Columbiana","Trumbull",18],["Columbiana","Washington",1],["Columbiana","Wayne",6],["Coshocton","Cuyahoga",1],["Coshocton","Franklin",3],["Coshocton","Guernsey",1],["Coshocton","Holmes",26],["Coshocton","Knox",4],["Coshocton","Licking",5],["Coshocton","Medina",3],["Coshocton","Muskingum",15],["Coshocton","Stark",3],["Coshocton","Wayne",3],["Cuyahoga","Delaware",18],["Cuyahoga","Erie",35],["Cuyahoga","Fairfield",6],["Cuyahoga","Franklin",70],["Cuyahoga","Geauga",138],["Cuyahoga","Greene",12],["Cuyahoga","Guernsey",3],["Cuyahoga","Hamilton",11],["Cuyahoga","Highland",2],["Cuyahoga","Holmes",43],["Cuyahoga","Huron",6],["Cuyahoga","Knox",2],["Cuyahoga","Lake",446],["Cuyahoga","Licking",11],["Cuyahoga","Logan",5],["Cuyahoga","Lorain",305],["Cuyahoga","Lucas",30],["Cuyahoga","Madison",1],["Cuyahoga","Mahoning",17],["Cuyahoga","Medina",329],["Cuyahoga","Montgomery",29],["Cuyahoga","Morgan",2],["Cuyahoga","Muskingum",13],["Cuyahoga","Ottawa",36],["Cuyahoga","Portage",80],["Cuyahoga","Stark",74],["Cuyahoga","Summit",563],["Cuyahoga","Trumbull",16],["Cuyahoga","Union",3],["Cuyahoga","Warren",6],["Cuyahoga","Wayne",46],["Delaware","Erie",5],["Delaware","Fairfield",3],["Delaware","Franklin",125],["Delaware","Greene",8],["Delaware","Hamilton",2],["Delaware","Holmes",4],["Delaware","Huron",1],["Delaware","Knox",3],["Delaware","Lake",5],["Delaware","Licking",39],["Delaware","Logan",58],["Delaware","Lucas",3],["Delaware","Mahoning",1],["Delaware","Medina",1],["Delaware","Montgomery",6],["Delaware","Morgan",1],["Delaware","Muskingum",17],["Delaware","Ottawa",4],["Delaware","Stark",8],["Delaware","Summit",8],["Delaware","Trumbull",2],["Delaware","Union",6],["Delaware","Warren",2],["Delaware","Washington",2],["Delaware","Wayne",4],["Erie","Franklin",9],["Erie","Geauga",2],["Erie","Greene",1],["Erie","Huron",10],["Erie","Lake",2],["Erie","Licking",1],["Erie","Logan",3],["Erie","Lorain",12],["Erie","Lucas",5],["Erie","Mahoning",1],["Erie","Medina",2],["Erie","Montgomery",1],["Erie","Muskingum",1],["Erie","Ottawa",3],["Erie","Portage",3],["Erie","Summit",2],["Erie","Trumbull",1],["Erie","Union",1],["Erie","Warren",1],["Erie","Wayne",2],["Fairfield","Franklin",98],["Fairfield","Greene",5],["Fairfield","Hamilton",2],["Fairfield","Highland",1],["Fairfield","Holmes",3],["Fairfield","Licking",72],["Fairfield","Logan",6],["Fairfield","Lucas",1],["Fairfield","Madison",1],["Fairfield","Mahoning",1],["Fairfield","Medina",1],["Fairfield","Montgomery",3],["Fairfield","Morgan",4],["Fairfield","Muskingum",32],["Fairfield","Pickaway",21],["Fairfield","Stark",3],["Fairfield","Summit",1],["Fairfield","Trumbull",1],["Fairfield","Washington",2],["Fairfield","Wayne",1],["Fayette","Franklin",3],["Fayette","Greene",10],["Fayette","Highland",21],["Fayette","Licking",1],["Fayette","Lorain",1],["Fayette","Madison",2],["Fayette","Montgomery",2],["Fayette","Pickaway",4],["Franklin","Geauga",1],["Franklin","Greene",33],["Franklin","Hamilton",22],["Franklin","Highland",26],["Franklin","Holmes",31],["Franklin","Huron",2],["Franklin","Knox",6],["Franklin","Lake",16],["Franklin","Licking",223],["Franklin","Logan",213],["Franklin","Lorain",1],["Franklin","Lucas",18],["Franklin","Madison",12],["Franklin","Mahoning",1],["Franklin","Medina",5],["Franklin","Montgomery",49],["Franklin","Morgan",4],["Franklin","Muskingum",78],["Franklin","Ottawa",9],["Franklin","Pickaway",37],["Franklin","Portage",2],["Franklin","Stark",25],["Franklin","Summit",32],["Franklin","Trumbull",3],["Franklin","Union",43],["Franklin","Warren",5],["Franklin","Wayne",13],["Geauga","Holmes",1],["Geauga","Huron",1],["Geauga","Lake",116],["Geauga","Lorain",1],["Geauga","Medina",1],["Geauga","Muskingum",1],["Geauga","Ottawa",1],["Geauga","Portage",7],["Geauga","Stark",2],["Geauga","Summit",14],["Geauga","Trumbull",7],["Greene","Hamilton",13],["Greene","Highland",54],["Greene","Holmes",1],["Greene","Huron",1],["Greene","Lake",1],["Greene","Licking",5],["Greene","Logan",33],["Greene","Lucas",2],["Greene","Madison",7],["Greene","Montgomery",612],["Greene","Morgan",1],["Greene","Muskingum",3],["Greene","Ottawa",2],["Greene","Stark",3],["Greene","Summit",5],["Greene","Union",2],["Greene","Warren",94],["Greene","Wayne",2],["Guernsey","Holmes",1],["Guernsey","Lorain",1],["Guernsey","Medina",1],["Guernsey","Muskingum",32],["Guernsey","Portage",1],["Guernsey","Stark",4],["Guernsey","Summit",2],["Guernsey","Trumbull",1],["Guernsey","Wayne",1],["Hamilton","Highland",40],["Hamilton","Holmes",1],["Hamilton","Lake",2],["Hamilton","Licking",3],["Hamilton","Logan",33],["Hamilton","Lorain",1],["Hamilton","Lucas",9],["Hamilton","Medina",2],["Hamilton","Montgomery",42],["Hamilton","Muskingum",1],["Hamilton","Portage",1],["Hamilton","Stark",4],["Hamilton","Summit",4],["Hamilton","Trumbull",1],["Hamilton","Union",3],["Hamilton","Warren",84],["Hamilton","Wayne",2],["Harrison","Highland",1],["Harrison","Summit",1],["Highland","Holmes",1],["Highland","Lake",2],["Highland","Licking",3],["Highland","Logan",2],["Highland","Madison",1],["Highland","Medina",2],["Highland","Montgomery",74],["Highland","Pickaway",2],["Highland","Summit",2],["Highland","Union",5],["Highland","Warren",60],["Highland","Washington",1],["Highland","Wayne",3],["Holmes","Huron",2],["Holmes","Knox",7],["Holmes","Lake",4],["Holmes","Licking",14],["Holmes","Logan",2],["Holmes","Lorain",14],["Holmes","Lucas",2],["Holmes","Madison",1],["Holmes","Medina",28],["Holmes","Montgomery",1],["Holmes","Morgan",1],["Holmes","Muskingum",39],["Holmes","Ottawa",2],["Holmes","Portage",1],["Holmes","Stark",55],["Holmes","Summit",27],["Holmes","Trumbull",1],["Holmes","Warren",1],["Holmes","Washington",2],["Holmes","Wayne",235],["Huron","Licking",1],["Huron","Lorain",4],["Huron","Lucas",3],["Huron","Medina",1],["Huron","Ottawa",1],["Huron","Portage",1],["Huron","Stark",2],["Huron","Summit",2],["Knox","Licking",37],["Knox","Montgomery",1],["Knox","Morgan",1],["Knox","Muskingum",10],["Knox","Stark",2],["Knox","Summit",2],["Knox","Wayne",1],["Lake","Licking",1],["Lake","Lorain",1],["Lake","Lucas",3],["Lake","Mahoning",8],["Lake","Medina",4],["Lake","Montgomery",2],["Lake","Muskingum",5],["Lake","Ottawa",3],["Lake","Portage",7],["Lake","Stark",19],["Lake","Summit",31],["Lake","Trumbull",11],["Lake","Wayne",5],["Licking","Logan",10],["Licking","Lorain",3],["Licking","Lucas",2],["Licking","Madison",1],["Licking","Mahoning",1],["Licking","Medina",3],["Licking","Montgomery",7],["Licking","Morgan",3],["Licking","Muskingum",144],["Licking","Pickaway",9],["Licking","Stark",7],["Licking","Summit",10],["Licking","Union",4],["Licking","Warren",9],["Licking","Washington",2],["Licking","Wayne",7],["Logan","Lucas",5],["Logan","Madison",9],["Logan","Medina",1],["Logan","Montgomery",93],["Logan","Muskingum",3],["Logan","Pickaway",6],["Logan","Stark",2],["Logan","Summit",2],["Logan","Trumbull",1],["Logan","Union",74],["Logan","Warren",16],["Logan","Wayne",4],["Lorain","Lucas",3],["Lorain","Medina",5],["Lorain","Muskingum",5],["Lorain","Ottawa",6],["Lorain","Portage",1],["Lorain","Stark",8],["Lorain","Summit",11],["Lorain","Washington",1],["Lorain","Wayne",4],["Lucas","Medina",1],["Lucas","Montgomery",6],["Lucas","Muskingum",3],["Lucas","Ottawa",21],["Lucas","Portage",1],["Lucas","Seneca",1],["Lucas","Stark",4],["Lucas","Summit",10],["Lucas","Union",1],["Lucas","Warren",1],["Lucas","Wayne",2],["Lucas","Williams",2],["Madison","Muskingum",1],["Madison","Pickaway",1],["Madison","Union",6],["Madison","Wayne",1],["Mahoning","Medina",1],["Mahoning","Muskingum",3],["Mahoning","Portage",3],["Mahoning","Stark",32],["Mahoning","Summit",15],["Mahoning","Trumbull",34],["Mahoning","Union",1],["Mahoning","Warren",1],["Mahoning","Wayne",2],["Medina","Muskingum",11],["Medina","Ottawa",6],["Medina","Portage",2],["Medina","Stark",39],["Medina","Summit",223],["Medina","Trumbull",1],["Medina","Union",2],["Medina","Wayne",103],["Montgomery","Muskingum",4],["Montgomery","Ottawa",1],["Montgomery","Pickaway",3],["Montgomery","Stark",4],["Montgomery","Summit",19],["Montgomery","Trumbull",1],["Montgomery","Union",2],["Montgomery","Warren",237],["Morgan","Muskingum",11],["Morgan","Portage",1],["Morgan","Washington",6],["Muskingum","Ottawa",1],["Muskingum","Pickaway",2],["Muskingum","Portage",6],["Muskingum","Stark",16],["Muskingum","Summit",12],["Muskingum","Trumbull",2],["Muskingum","Union",4],["Muskingum","Warren",3],["Muskingum","Washington",5],["Muskingum","Wayne",30],["Ottawa","Pickaway",1],["Ottawa","Seneca",1],["Ottawa","Stark",1],["Ottawa","Summit",5],["Ottawa","Wayne",2],["Pickaway","Union",3],["Pickaway","Warren",1],["Pickaway","Wayne",2],["Portage","Stark",72],["Portage","Summit",282],["Portage","Trumbull",6],["Portage","Wayne",3],["Seneca","Stark",1],["Seneca","Summit",1],["Stark","Summit",545],["Stark","Trumbull",5],["Stark","Warren",6],["Stark","Washington",1],["Stark","Wayne",118],["Summit","Trumbull",17],["Summit","Union",3],["Summit","Warren",3],["Summit","Washington",2],["Summit","Wayne",158],["Summit","Williams",1],["Union","Warren",1],["Warren","Wayne",1]],"cents":{"Geauga":[588.7,77.2],"Hancock":[250.2,171.4],"Hardin":[255.1,239.1],"Holmes":[477.9,245.8],"Licking":[411.3,333.9],"Madison":[271.6,368.7],"Miami":[179.5,357.6],"Noble":[540.1,393.4],"Pike":[320.2,520.4],"Sandusky":[317.3,103.2],"Seneca":[307.5,158.5],"Union":[288.6,300.4],"Wayne":[472.0,194.2],"Wood":[252.7,96.9],"Allen":[180.0,209.7],"Brown":[218.0,556.4],"Clinton":[221.4,456.3],"Defiance":[123.1,117.6],"Fayette":[276.8,435.6],"Meigs":[478.9,524.4],"Mercer":[111.3,248.7],"Morrow":[360.2,253.3],"Muskingum":[473.1,363.6],"Paulding":[120.4,148.4],"Pickaway":[339.8,419.1],"Portage":[570.4,139.7],"Preble":[96.2,390.1],"Richland":[404.9,212.2],"Ross":[333.2,461.4],"Shelby":[167.0,292.1],"Stark":[565.7,198.1],"Tuscarawas":[540.2,271.7],"Van Wert":[125.7,204.3],"Washington":[546.9,451.1],"Williams":[112.3,74.8],"Wyandot":[293.5,206.2],"Adams":[263.5,577.5],"Ashland":[434.4,195.6],"Auglaize":[167.4,253.4],"Belmont":[626.7,345.8],"Butler":[119.2,447.0],"Carroll":[593.3,242.5],"Clark":[212.7,372.8],"Clermont":[173.9,528.9],"Columbiana":[650.5,222.5],"Crawford":[345.5,202.8],"Darke":[105.6,331.5],"Delaware":[340.5,300.2],"Erie":[380.5,85.4],"Franklin":[334.7,349.8],"Hamilton":[116.6,496.9],"Highland":[260.6,487.8],"Huron":[386.2,154.2],"Jefferson":[646.8,283.0],"Lawrence":[398.5,599.9],"Lorain":[456.8,110.3],"Mahoning":[641.0,168.7],"Marion":[312.1,245.1],"Athens":[461.9,467.4],"Champaign":[239.4,320.6],"Coshocton":[479.2,298.9],"Fairfield":[386.1,390.3],"Guernsey":[536.8,348.3],"Henry":[183.3,112.2],"Knox":[411.0,282.1],"Logan":[229.1,278.9],"Medina":[476.2,140.2],"Morgan":[496.4,420.2],"Perry":[440.4,391.2],"Putnam":[171.3,171.2],"Summit":[537.2,139.4],"Warren":[176.8,447.0],"Lake":[563.4,46.7],"Lucas":[271.8,53.5],"Monroe":[602.6,404.8],"Montgomery":[172.8,380.6],"Ottawa":[354.1,69.2],"Scioto":[344.6,572.7],"Trumbull":[658.0,116.0],"Vinton":[417.6,481.8],"Ashtabula":[643.6,17.7],"Cuyahoga":[514.2,82.9],"Fulton":[183.1,60.2],"Gallia":[434.6,571.7],"Harrison":[586.4,302.3],"Hocking":[404.9,434.1],"Jackson":[382.6,525.5],"Greene":[215.7,394.2]},"crossTotal":{"groups":12814,"usd":23518},"state":{"incounty":{"A":{"n":9761,"keepMax":533306,"keepMin":1118887},"L":{"n":8952,"keepMax":615835,"keepMin":1106272},"B":{"n":7431,"keepMax":624221,"keepMin":1115845},"C":{"n":2129,"keepMax":226783,"keepMin":374271,"total":504137}},"cross":{"A":{"n":12814,"measured":208345,"potential":670318},"B":{"n":154999,"measured":26694761,"potential":5636575},"C":{"n":0,"measured":0,"potential":0}},"entity":{"A":{"n":0,"usd":0},"B":{"n":0,"usd":0},"C":{"n":17983,"usd":2025629}}}};
+const MODES={
+ cross:{label:"Same name, different counties",metric:"cross",usd:"cross_usd",
+   desc:"The same name getting the credit here and in another Ohio county at the same time. Only counts matches where an address also lines up, so these are the strong leads."},
+ incounty:{label:"Same name, same county",metric:"incounty",usd:"incounty_usd",
+   desc:"The same name getting the credit on two or more homes inside one county. Matched on name alone, so check each one. Franklin has a closer audit; see its panel."},
+ entity:{label:"Company-owned homes",metric:"entity",usd:"entity_usd",
+   desc:"Homes getting the credit while owned by a company (LLC, partnership, or corporation) instead of a person."}};
+let mode="incounty";
+let pinned=null;
+const $=s=>document.querySelector(s);
+const counties=DATA.counties, cents=DATA.cents;
+const fmt=n=>n.toLocaleString("en-US");
+const usd=n=>"$"+n.toLocaleString("en-US");
+
+function ramp(t){ // interpolate --ramp0 -> --ramp1
+  const cs=getComputedStyle(document.documentElement);
+  const a=hex(cs.getPropertyValue("--ramp0")),b=hex(cs.getPropertyValue("--ramp1"));
+  const m=a.map((v,i)=>Math.round(v+(b[i]-v)*t));
+  return `rgb(${m[0]},${m[1]},${m[2]})`;
+}
+function hex(h){h=h.trim().slice(1);return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16));}
+
+function paint(){
+  const M=MODES[mode];
+  const vals=Object.values(counties).map(c=>c[M.metric]).filter(v=>v>0);
+  const max=Math.max(1,...vals);
+  document.querySelectorAll("#counties path").forEach(p=>{
+    const c=counties[p.dataset.name];
+    p.classList.toggle("has",!!c);
+    if(!c){p.style.fill="";return;}
+    const v=c[M.metric];
+    p.style.fill=v>0?ramp(Math.sqrt(v/max)):ramp(0.04);
+  });
+  clearLines();
+  pinned=null;
+  document.querySelectorAll(".pinned").forEach(x=>x.classList.remove("pinned"));
+  panelDefault();
+  renderState();
+  document.querySelectorAll(".toggles button").forEach(b=>
+    b.classList.toggle("on",b.dataset.mode===mode));
+}
+
+// Per-mode tier layout: the count label, the dollar fields, and the count
+// noun. Tier meanings are shared; each tier's numbers live in DATA.state.
+const TIERCFG={
+  incounty:{noun:"owners",count:"Duplicate owners",
+    dollars:[["keepMax","excess if priciest home kept"],
+             ["keepMin","excess if cheapest home kept"]],
+    dollarsC:[["total","credit these companies get"],
+              ["keepMax","excess even if each keeps one credit"]],
+    labelC:"Company or trust on several homes"},
+  cross:{noun:"owners",count:"Duplicate owners",
+    dollars:[["measured","measured excess (cheaper home kept)"],
+             ["potential","one-sided potential (partner unpriced)"]]},
+  entity:{noun:"parcels",count:"Parcels with the credit",
+    dollars:[["usd","annual credit dollars"]]}};
+const TIERLABEL={A:"Strong: more than the name matches",
+                 L:"Likely: a rare name, probably one person",
+                 B:"Weak: only the name matches",
+                 C:"Company-owned"};
+const TIERWORD={A:"Strong",L:"Likely",B:"Weak",C:"Company"};
+const TIERS=["A","L","B","C"];
+// Which tiers are summed into the total; A on by default, the rest opt-in.
+// L (rare-name likely duplicates) only exists for the same-county view.
+const tierOn={A:true,L:false,B:false,C:false};
+
+function renderState(){
+  const cfg=TIERCFG[mode], st=DATA.state[mode];
+  // Per-tier breakdown (always shown so each tier's size is visible).
+  let breakdown="";
+  for(const t of TIERS){
+    const d=st[t];
+    if(!d||(!d.n && cfg.dollars.every(([f])=>!d[f])))continue; // skip empty
+    const dl=(t==="C"&&cfg.dollarsC)||cfg.dollars; // company rows read differently
+    const lbl=(t==="C"&&cfg.labelC)||TIERLABEL[t];
+    breakdown+=`<div class="tierhead">${lbl}</div>
+      <div class="stat sub2"><span>${cfg.count}</span><b>${fmt(d.n)}</b></div>`;
+    for(const [f,lab] of dl){
+      if(d[f]===undefined)continue;
+      breakdown+=`<div class="stat sub2"><span>&nbsp;&nbsp;${lab}</span><b>${usd(d[f])}/yr</b></div>`;
+    }
+  }
+  // Checkbox row - only tiers this view has.
+  let boxes="";
+  for(const t of TIERS){
+    if(!st[t])continue;
+    boxes+=`<label class="tierbox"><input type="checkbox" data-tier="${t}"${tierOn[t]?" checked":""}> ${TIERWORD[t]}</label>`;
+  }
+  // Combined total over the checked tiers. When only Company is checked,
+  // use its own dollar labels (the keep-a-home framing fits people, not
+  // companies).
+  const on=TIERS.filter(t=>tierOn[t]&&st[t]);
+  const dlTot=(on.length===1&&on[0]==="C"&&cfg.dollarsC)?cfg.dollarsC:cfg.dollars;
+  let tn=0; const tsum={};
+  for(const [f] of dlTot)tsum[f]=0;
+  for(const t of on){
+    tn+=st[t].n;
+    for(const [f] of dlTot)if(st[t][f]!==undefined)tsum[f]+=st[t][f];
+  }
+  let totrows=`<div class="stat totrow"><span>${cfg.count}</span><b>${fmt(tn)}</b></div>`;
+  for(const [f,lab] of dlTot)
+    totrows+=`<div class="stat totrow"><span>${lab}</span><b>${usd(tsum[f])}/yr</b></div>`;
+  $("#statepanel").innerHTML=`<h2>Statewide total</h2>
+   <div class="tag">counties with a published credit flag &middot; dollars are county figures or estimates</div>
+   <div class="tierrow"><span class="tierlbl">Include</span>${boxes}</div>
+   <div class="tiertot">Showing: ${on.length?on.map(t=>TIERWORD[t]).join(" + "):"none"}</div>
+   ${totrows}
+   <details class="tierdetail"><summary>Break it down</summary>${breakdown||'<div class="note">Nothing in any group for this view.</div>'}</details>
+   <div class="note"><b>Strong</b> = something beyond the name lines up, like a shared mailing address or co-owner. <b>Likely</b> = only the name matches, but few people share that name, so it is probably one owner. <b>Weak</b> = only the name matches and many people share it, so some of these are different people. <b>Company</b> = the same company, or the same trust, credited on two or more homes in one county. A single trust can legally hold the credit for the person who lives there, but one trust with several credited homes needs a look. Ohio can go back and correct up to 5 past years plus the current one.</div>`;
+  $("#statepanel").querySelectorAll("input[data-tier]").forEach(cb=>
+    cb.addEventListener("change",()=>{tierOn[cb.dataset.tier]=cb.checked;renderState();}));
+}
+
+function clearLines(){$("#lines").innerHTML="";
+  document.querySelectorAll(".partner").forEach(p=>p.classList.remove("partner"));}
+
+function showLines(name){
+  clearLines();
+  if(mode!=="cross")return;
+  const g=$("#lines");
+  DATA.links.forEach(([a,b,n])=>{
+    if(a!==name&&b!==name)return;
+    const o=a===name?b:a;
+    const p1=cents[name],p2=cents[o];
+    if(!p1||!p2)return;
+    const mx=(p1[0]+p2[0])/2,my=(p1[1]+p2[1])/2-22;
+    const path=document.createElementNS("http://www.w3.org/2000/svg","path");
+    path.setAttribute("d",`M${p1[0]},${p1[1]} Q${mx},${my} ${p2[0]},${p2[1]}`);
+    path.setAttribute("class","link-line");
+    g.appendChild(path);
+    const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x",mx);t.setAttribute("y",my+8);
+    t.setAttribute("text-anchor","middle");t.setAttribute("class","link-num");
+    t.textContent=n;
+    g.appendChild(t);
+    const el=document.getElementById("c-"+o.replace(/ /g,"_"));
+    if(el)el.classList.add("partner");
+  });
+}
+
+function panelDefault(){
+  const M=MODES[mode];
+  let tot=0,totUsd=0,n=0;
+  for(const c of Object.values(counties)){tot+=c[M.metric];totUsd+=c[M.usd];n++;}
+  if(mode==="cross"){tot=DATA.crossTotal.groups;totUsd=DATA.crossTotal.usd;}
+  $("#panel").innerHTML=`<h2>${M.label}</h2>
+   <div class="tag">${n} counties loaded &middot; statewide view</div>
+   <div class="stat"><span>${mode==="cross"?"People found statewide":"Total in loaded counties"}</span><b>${fmt(tot)}</b></div>
+   <div class="stat"><span>${mode==="cross"?"Extra credit per year":"Credit dollars per year"}</span><b>${usd(totUsd)}</b></div>
+   <div class="note">${M.desc}</div>
+   <div class="legend"><span class="grad"></span><span>fewer &rarr; more</span></div>
+   <div class="legend"><span class="chip"></span><span>no data loaded</span></div>`;
+}
+
+function panelFor(name){
+  const c=counties[name];
+  if(!c){$("#panel").innerHTML=`<h2>${name} County</h2>
+    <div class="tag">no data loaded</div>
+    <div class="note">This county's parcel and credit data has not been collected yet. Bulk availability varies by county.</div>`;return;}
+  const M=MODES[mode];
+  let extra="";
+  if(name==="Franklin"&&mode==="incounty")
+    extra=`<div class="note">Franklin has a closer audit (tested against the Jan. 1 ownership date, rentals removed): 5,452 owners, about $556k/yr in extra credits.</div>`;
+  if(c.flagOnly&&c.claimants)
+    extra+=`<div class="note">This county says which homes get the credit but not the dollar amount, so dollars show as $0.</div>`;
+  if(c.roll&&!c.claimants)
+    extra+=`<div class="note">This county doesn't publish the credit flag, only who owns what. We use it to show where a person also owns a home in another county.</div>`;
+  const tag=c.claimants?`${fmt(c.claimants)} homes getting the credit${c.dollars?" &middot; "+usd(c.dollars)+"/yr":""}`:`${fmt(c.roll)} properties on the ownership roll (no credit flag)`;
+  const dl=c.dlx?`<a class="dlbtn" href="${c.dlx}" download><svg viewBox="0 0 24 24"><path d="M12 3v13m0 0l-4.5-4.5M12 16l4.5-4.5M4 20h16"/></svg>Download ${name} records &middot; ${fmt(c.dlrows)} rows (Excel)</a>
+   <a class="dlcsv" href="${c.dl}" download>or download as CSV</a>
+   <div class="disclaimer"><b>This is a starting list, not proof.</b> A home can be here for innocent reasons: the credit is always a year behind, so a home that just sold may still show the old owner's credit; two people can share a name; and a trust, LLC, or life estate can legally hold the credit with the right paperwork on file. Look each one up on the county auditor's website before contacting anyone.</div>`:"";
+  const pin=pinned===name?`<div class="pinhint">Selected &middot; click ${name} again to deselect</div>`:"";
+  $("#panel").innerHTML=`<h2>${name} County</h2>
+   <div class="tag">${tag}</div>${pin}
+   <div class="stat"><span>${MODES.incounty.label}</span><b>${fmt(c.incounty)}</b></div>
+   <div class="stat"><span>&nbsp;&nbsp;excess $/yr</span><b>${usd(c.incounty_usd)}</b></div>
+   <div class="stat"><span>${MODES.cross.label}</span><b>${fmt(c.cross)}</b></div>
+   <div class="stat"><span>&nbsp;&nbsp;credit $ in those groups</span><b>${usd(c.cross_usd)}</b></div>
+   <div class="stat"><span>${MODES.entity.label}</span><b>${fmt(c.entity)}</b></div>
+   <div class="stat"><span>&nbsp;&nbsp;credit $/yr</span><b>${usd(c.entity_usd)}</b></div>
+   ${extra}${dl}`;
+}
+
+document.querySelectorAll("#counties path").forEach(p=>{
+  p.addEventListener("mouseenter",()=>{
+    document.querySelectorAll(".hover").forEach(x=>x.classList.remove("hover"));
+    p.classList.add("hover");
+    if(pinned)return;  // a county is selected: keep its panel + lines fixed
+    showLines(p.dataset.name);  // hover only traces links; panel opens on click
+  });
+  p.addEventListener("click",()=>{
+    const name=p.dataset.name;
+    document.querySelectorAll(".pinned,.hover").forEach(x=>
+      x.classList.remove("pinned","hover"));
+    if(pinned===name){pinned=null;panelDefault();clearLines();return;}
+    pinned=name;p.classList.add("pinned");
+    panelFor(name);showLines(name);
+  });
+});
+document.querySelectorAll(".toggles button").forEach(b=>
+  b.addEventListener("click",()=>{mode=b.dataset.mode;paint();}));
+
+// county name labels for loaded counties
+const lg=$("#labels");
+Object.keys(counties).forEach(n=>{
+  const c=cents[n]; if(!c)return;
+  const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+  t.setAttribute("x",c[0]);t.setAttribute("y",c[1]+3);
+  t.setAttribute("class","cname");t.textContent=n;
+  lg.appendChild(t);
+});
+paint();
+</script></body></html>
