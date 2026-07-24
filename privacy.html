@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy &amp; Data - Ohio Owner-Occupancy Credit Audit</title>
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/Inter.woff2') format('woff2')}
+@font-face{font-family:'Inter Tight';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/InterTight.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:100 800;font-display:swap;src:url('fonts/JetBrainsMono.woff2') format('woff2')}
+:root{
+  --bg:#FAF8F5; --panel:#FFFFFF; --ink:#1A1512; --ink2:#57504A; --muted:#8C857D;
+  --border:rgba(26,21,18,.11); --border-strong:rgba(26,21,18,.20);
+  --accent:#C2410C;
+  --card-shadow:0 1px 2px rgba(26,21,18,.04),0 10px 30px rgba(26,21,18,.05);
+  --radius:24px;
+  --disp:"Inter Tight","Inter",system-ui,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",monospace;
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);
+  font-size:14.5px;line-height:1.6;padding:34px 20px;
+  background-image:
+    radial-gradient(620px 420px at 10% 2%,rgba(194,65,12,.05),transparent 70%),
+    radial-gradient(700px 480px at 94% 100%,rgba(109,79,196,.045),transparent 70%);
+  background-attachment:fixed}
+.page{max-width:760px;margin:0 auto}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);display:inline-block;padding:5px 12px;
+  border:1px solid var(--border);border-radius:999px;background:rgba(249,164,116,.05)}
+h1{font-family:var(--disp);font-weight:680;font-size:clamp(28px,5vw,42px);
+  line-height:1.05;letter-spacing:-.03em;margin:16px 0 0;
+  background:linear-gradient(160deg,#1A1512 30%,#7A4A2E);-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+.lede{color:var(--ink2);font-size:15.5px;margin:12px 0 0;max-width:58ch}
+.card{border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;
+  background:var(--panel);box-shadow:var(--card-shadow);margin-top:18px}
+.card h2{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em;
+  margin:0 0 8px}
+.card p{color:var(--ink2);margin:0 0 10px}
+.card p:last-child{margin-bottom:0}
+.card b{color:var(--ink);font-weight:600}
+a{color:var(--accent)}
+.back{display:inline-block;margin-top:26px;font-family:var(--mono);font-size:12px;
+  letter-spacing:.05em;text-transform:uppercase;text-decoration:none;
+  border:1px solid var(--border);border-radius:999px;padding:8px 16px;color:var(--ink2)}
+.back:hover{border-color:var(--border-strong);color:var(--ink)}
+footer{margin-top:30px;color:var(--muted);font-size:12.5px}
+</style></head>
+<body><div class="page">
+<span class="eyebrow">Privacy &amp; Data</span>
+<h1>How this site handles data</h1>
+<p class="lede">Two things matter here: what this site knows about you as a visitor, and where the property records on the map come from. Both are covered below.</p>
+
+<div class="card">
+  <h2>What this site knows about its visitors</h2>
+  <p><b>There are no accounts, no forms, no cookies, and no ad trackers.</b> Nothing you do here is tied to you as a person. The fonts are served from this site itself, so your visit is not shared with a font provider.</p>
+  <p>The only measurement is <b>Cloudflare Web Analytics</b>, a cookie-free counter. It tells us totals, like how many people viewed a page and which countries they came from. It does not use cookies, does not follow you to other sites, and does not build a profile of you.</p>
+  <p>The site is hosted on GitHub Pages. Like any web host, GitHub records standard server logs (such as IP addresses) to run the service, under <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's privacy statement</a>. We never see those logs.</p>
+</div>
+
+<div class="card">
+  <h2>Where the property data comes from</h2>
+  <p>Every name, address, parcel number, and dollar figure on this site comes from <b>public records published by Ohio county auditors</b>: their bulk data downloads, GIS services, and property search sites. Property ownership and tax records are public under Ohio law.</p>
+  <p>Nothing here comes from private databases, purchased lists, or scraping of personal accounts. The figures reflect tax year 2025 county files and are refreshed when counties publish new data, so recent sales and corrections can take time to appear.</p>
+</div>
+
+<div class="card">
+  <h2>A flag is a lead, not an accusation</h2>
+  <p>This site flags patterns that are <b>worth checking, not proof of wrongdoing</b>. A home can appear here for innocent reasons: the credit always runs a year behind, so a home that just sold may still show the previous owner's credit; two different people can share a name; and a trust, LLC, or life estate can legally hold the credit with the right paperwork on file.</p>
+  <p>Anyone using this data should verify each parcel on the county auditor's website before drawing conclusions or contacting anyone.</p>
+</div>
+
+<div class="card">
+  <h2>Corrections and removal requests</h2>
+  <p>If you are listed here and believe the match is wrong, or you have paperwork on file that makes a flagged credit legitimate, email <a href="mailto:ohiocreditaudit@gmail.com">ohiocreditaudit@gmail.com</a> with the county and parcel number. We will review it and correct or annotate the entry in the next data update.</p>
+  <p>Because the underlying records are public county data, removing an entry here does not remove it from the county's own records.</p>
+</div>
+
+<a class="back" href="./">Back to the map</a>
+<footer>Last updated July 2026.</footer>
+</div></body></html>
