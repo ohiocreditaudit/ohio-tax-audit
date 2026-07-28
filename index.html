@@ -36,7 +36,7 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(30px,5vw,50px);
   line-height:1.03;letter-spacing:-.03em;margin:16px 0 0;text-wrap:balance;
   background:linear-gradient(160deg,#1A1512 30%,#7A4A2E);-webkit-background-clip:text;
   background-clip:text;color:transparent}
-.lede{color:var(--ink2);font-size:16px;max-width:62ch;margin:13px 0 0;line-height:1.55}
+.lede{color:var(--ink2);font-size:16px;margin:13px 0 0;line-height:1.55}
 .lede b{color:var(--accent);font-weight:600}
 .statstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 4px}
 .tile{border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;
@@ -59,7 +59,7 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(30px,5vw,50px);
   font-weight:600;box-shadow:0 0 26px rgba(249,164,116,.22)}
 .toggles button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .wrap{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
-.mapbox{flex:1 1 460px;max-width:820px;border:1px solid var(--border);
+.mapbox{flex:1 1 460px;border:1px solid var(--border);
   border-radius:var(--radius-lg);padding:14px;background:var(--panel);
   box-shadow:var(--card-shadow)}
 svg{width:100%;height:auto;display:block}
@@ -103,12 +103,19 @@ path[data-name].partner{stroke:var(--accent2);stroke-width:1.6}
 .stat.totrow{border-bottom:0;padding:5px 0}
 .stat.totrow span{color:var(--ink2)}
 .stat.totrow b{font-family:var(--disp);font-size:20px;font-weight:660}
-.tierdetail{margin-top:10px;font-size:12px;border-top:1px solid var(--border);padding-top:4px}
-.tierdetail summary{cursor:pointer;color:var(--ink2);font-size:12px;padding:6px 0;
-  user-select:none;list-style:none}
+.tierdetail{margin-top:10px;font-size:12px;border-top:1px solid var(--border);padding-top:10px}
+.tierdetail summary{display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+  color:var(--ink2);font-size:12.5px;font-weight:600;padding:7px 14px;
+  border:1px solid var(--border);border-radius:999px;user-select:none;
+  list-style:none;transition:all .16s}
+.tierdetail summary:hover{border-color:var(--accent);color:var(--ink)}
+.tierdetail summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tierdetail summary::-webkit-details-marker{display:none}
-.tierdetail summary::before{content:"\25B8  ";color:var(--accent)}
-.tierdetail[open] summary::before{content:"\25BE  "}
+.tierdetail summary::before{content:"\25BE";color:var(--accent);font-size:14px;
+  line-height:1;transition:transform .16s}
+.tierdetail[open] summary{background:rgba(249,164,116,.10);border-color:var(--accent);
+  color:var(--ink)}
+.tierdetail[open] summary::before{transform:rotate(180deg)}
 .tierhead{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;
   text-transform:uppercase;color:var(--accent);margin:10px 0 2px}
 .stat.sub2{font-size:12px;padding:4px 0;border-bottom:0}
@@ -152,6 +159,12 @@ path[data-name].partner{stroke:var(--accent2);stroke-width:1.6}
   the same name on two homes, in two counties, or on a home owned by a company.
   <b>Click</b> any county to see its records and download the list. Gray counties
   aren't loaded yet.</p>
+  <p class="lede">Here's the gap that makes this possible: <b>no one checks across
+  county lines</b>. Ohio's 88 county auditors don't compare their credit rolls with
+  each other, and the state doesn't either. When you apply, you simply attest that
+  you don't claim the break on any other home. It runs on the honor system, so a
+  second claim in another county is only caught if someone goes looking. This map
+  is someone going looking.</p>
 </header>
 <div class="statstrip"><div class="tile"><div class="k">Counties loaded</div><div class="v">52</div><div class="m">counties with data</div></div><div class="tile"><div class="k">Extra credit / yr, one county</div><div class="v accent">$2,000,145</div><div class="m">same name, 2+ homes in a county</div></div><div class="tile"><div class="k">Strong cross-county leads</div><div class="v accent">12,814</div><div class="m">same owner in two counties</div></div><div class="tile"><div class="k">Company-owned credit / yr</div><div class="v accent">$2,025,629</div><div class="m">held by an LLC or corporation</div></div></div>
 <div class="toggles">
