@@ -288,7 +288,15 @@ $("#expand").addEventListener("click",()=>{
     bigMap?map.cooperativeGestures.disable():map.cooperativeGestures.enable();
   if(window.parent!==window)
     parent.postMessage({auditExpand:bigMap},location.origin);
-  setTimeout(()=>{map.resize();placeExpand();},350);
+  setTimeout(()=>{
+    map.resize();
+    placeExpand();
+    // still at the state view: re-frame the whole state for the new shape
+    if(map.getZoom()<9){
+      const cam=map.cameraForBounds([[-84.83,38.38],[-80.5,42.0]],{padding:16});
+      if(cam)map.easeTo({...cam,duration:600});
+    }
+  },350);
 });
 function collapseAttrib(){
   const a=document.querySelector(".maplibregl-ctrl-attrib");
@@ -320,6 +328,7 @@ map.on("load",()=>{
     "circle-radius":["interpolate",["linear"],["zoom"],7.5,1.4,9,2.4,11,3.4,12.9,5],
     "circle-opacity":["interpolate",["linear"],["zoom"],7.5,0,8.6,.85],
     "circle-stroke-color":"#FFFFFF",
+    "circle-stroke-opacity":["interpolate",["linear"],["zoom"],7.5,0,8.6,.85],
     "circle-stroke-width":["interpolate",["linear"],["zoom"],7.5,.15,12,.8]}});
   map.addSource("links",{type:"geojson",data:{type:"FeatureCollection",features:[]}});
   map.addLayer({id:"links-case",type:"line",source:"links",
