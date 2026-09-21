@@ -178,6 +178,10 @@ path[data-name].partner{stroke:var(--accent2);stroke-width:1.6}
 @media (max-width:640px){.pmframe{height:440px}.pmcard{padding:16px 14px 10px}}
 .homeframe{display:block;width:100%;height:640px;border:none;border-radius:20px;background:#FAF8F5}
 @media (max-width:640px){.homeframe{height:460px}}
+.homeframe.mapfull{position:fixed;inset:0;width:100vw;height:100dvh;z-index:1000;
+  border-radius:0;background:#FAF8F5}
+.lockscroll{overflow:hidden}
+.lockscroll body{overflow:hidden}
 .foot{color:var(--muted);font-size:11px;margin-top:26px;text-align:center;
   font-family:var(--mono);letter-spacing:.02em}
 @media (max-width:900px){.rightcol{flex:1 1 100%;max-width:none}}
@@ -373,7 +377,13 @@ function panelFor(name){
 
 window.addEventListener("message",e=>{
   if(e.origin!==location.origin)return;
-  const name=e.data&&e.data.auditCounty;
+  const d=e.data||{};
+  if("auditExpand" in d){
+    document.querySelector(".homeframe").classList.toggle("mapfull",!!d.auditExpand);
+    document.documentElement.classList.toggle("lockscroll",!!d.auditExpand);
+    return;
+  }
+  const name=d.auditCounty;
   if(!name)return;
   pinned=name;
   panelFor(name);
