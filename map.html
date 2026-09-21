@@ -98,7 +98,13 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(20px,3vw,30px);
 .money .mk{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .money .mv{font-family:var(--disp);font-weight:660;font-size:20px;margin-top:4px;
   font-variant-numeric:tabular-nums;color:var(--accent)}
-.card .why{font-size:12.5px;color:var(--ink2);margin-top:12px;line-height:1.5}
+.card .why{font-size:12.5px;color:var(--ink2);margin-top:6px;line-height:1.5}
+.card .whyd{margin-top:10px}
+.card .whyd summary{cursor:pointer;font-size:11.5px;font-weight:600;color:var(--accent);
+  list-style:none;display:flex;align-items:center;gap:5px;user-select:none}
+.card .whyd summary::-webkit-details-marker{display:none}
+.card .whyd summary::before{content:"\25B8";font-size:10px;transition:transform .15s}
+.card .whyd[open] summary::before{transform:rotate(90deg)}
 .card .sec{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--muted);margin:14px 0 6px}
 .plist{display:flex;flex-direction:column;gap:6px}
@@ -147,6 +153,8 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(20px,3vw,30px);
   background:rgba(255,255,255,.95);border:1px solid var(--border);border-radius:999px;
   padding:7px 12px;cursor:pointer;font-family:var(--body);box-shadow:var(--card-shadow)}
 .expand:hover{border-color:var(--accent)}
+.expand.on{background:var(--accent);color:#FFF7F2;border-color:transparent;
+  box-shadow:0 2px 14px rgba(194,65,12,.35)}
 html.embed .expand{display:flex}
 html.embed .btn.sub{display:none}
 .maplibregl-ctrl-attrib{font-size:9.5px;line-height:1.3}
@@ -169,7 +177,7 @@ html.embed .mapwrap{border:none;border-radius:0;box-shadow:none;min-height:100vh
     <div class="legend" id="legend"><div class="k">Match strength</div></div>
     <div class="hovertip" id="hovertip"></div>
     <div class="card" id="card"></div>
-    <button class="expand" id="expand" type="button">&#x26F6; Bigger map</button>
+    <button class="expand" id="expand" type="button">&#x26F6; Full screen</button>
     <div class="loading" id="loading">loading map data&hellip;</div>
   </div>
   <footer class="foot">an independent project, not affiliated with the State of Ohio or any county auditor or tax agency &middot; a flag is a lead, not proof &middot; parcel lines: county auditors via the Ohio statewide parcel program; credit data: county auditor public records, tax year 2025 &middot; <a href="privacy.html">privacy &amp; data</a></footer>
@@ -266,7 +274,8 @@ map.addControl(new maplibregl.NavigationControl({showCompass:false}),"bottom-rig
 let bigMap=false;
 $("#expand").addEventListener("click",()=>{
   bigMap=!bigMap;
-  $("#expand").innerHTML=bigMap?"&times; Close big map":"&#x26F6; Bigger map";
+  $("#expand").innerHTML=bigMap?"&times; Exit full screen":"&#x26F6; Full screen";
+  $("#expand").classList.toggle("on",bigMap);
   if(map.cooperativeGestures)
     bigMap?map.cooperativeGestures.disable():map.cooperativeGestures.enable();
   if(window.parent!==window)
@@ -310,6 +319,24 @@ map.on("load",()=>{
   map.addLayer({id:"links-pts",type:"circle",source:"links",
     filter:["==",["geometry-type"],"Point"],
     paint:{"circle-color":"#6D4FC4","circle-radius":4,"circle-stroke-color":"#fff","circle-stroke-width":1.2}});
+  map.addLayer({id:"links-hit",type:"line",source:"links",
+    paint:{"line-width":14,"line-color":"#000","line-opacity":0.01}});
+  map.on("mousemove","links-hit",e=>{
+    map.getCanvas().style.cursor="pointer";
+    tip.innerHTML=`<div class="d">click the line to see every linked property</div>`;
+    tip.style.display="block";
+    positionTip(e.point);
+  });
+  map.on("mouseleave","links-hit",()=>{map.getCanvas().style.cursor="";tip.style.display="none"});
+  map.on("click","links-hit",e=>{
+    if(!linkBounds)return;
+    const flayers=[];
+    for(const county of ACTIVE)flayers.push("ff-"+INDEX[county].slug);
+    if(map.queryRenderedFeatures(e.point,{layers:flayers.filter(l=>map.getLayer(l))}).length)return;
+    map.fitBounds(linkBounds,{padding:80,maxZoom:15});
+    tip.style.display="none";
+    e.originalEvent._handled=true;
+  });
   wireDots();
   applyFilter();
   addChoropleth();
@@ -545,11 +572,12 @@ function selectOnMap(county,pid){
   }
 }
 
+let linkBounds=null;
 function drawLinks(county,pid){
   const src=map.getSource("links");
   if(!src)return;
   const d=DET[county]&&DET[county][pid];
-  if(!d||!d.ll||!d.p||!d.p.length){src.setData({type:"FeatureCollection",features:[]});return}
+  if(!d||!d.ll||!d.p||!d.p.length){linkBounds=null;src.setData({type:"FeatureCollection",features:[]});return}
   const feats=[];
   const jobs=[];
   for(const[pc,ppid]of d.p.map(p=>[p[0],p[1]])){
@@ -562,12 +590,27 @@ function drawLinks(county,pid){
     }));
   }
   Promise.all(jobs).then(()=>{
-    if(selCounty===county&&selPid===pid)
-      src.setData({type:"FeatureCollection",features:feats});
+    if(selCounty!==county||selPid!==pid)return;
+    src.setData({type:"FeatureCollection",features:feats});
+    let b=null;
+    for(const f of feats){
+      const cs=f.geometry.type==="LineString"?f.geometry.coordinates:[f.geometry.coordinates];
+      for(const c of cs)b=b?b.extend(c):new maplibregl.LngLatBounds(c,c);
+    }
+    linkBounds=b;
   });
 }
 
-async function openCard(county,pid){
+function cardOffset(){
+  const wrap=document.querySelector(".mapwrap");
+  if(window.innerWidth<640){
+    const ch=$("#card").offsetHeight||wrap.clientHeight*0.46;
+    return [0,-Math.min(ch,wrap.clientHeight*0.5)/2];
+  }
+  return [-180,0];
+}
+
+async function openCard(county,pid,opts={}){
   const card=$("#card");
   selectOnMap(county,pid);
   tellParent(county);
@@ -576,7 +619,7 @@ async function openCard(county,pid){
     card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
       <h2>Parcel ${esc(pid)}</h2><div class="cty">${esc(county)} County</div>
       <div class="addr" style="margin-top:8px">loading details&hellip;</div>`;
-    card.classList.add("open");
+    card.classList.add("open");placeExpand();
     const all=await loadDetails(county);
     d=all&&all[pid];
     if(!d){
@@ -622,19 +665,17 @@ async function openCard(county,pid){
       ${d.h?`<div class="mtile"><div class="mk">Homestead</div><div class="mv">${usd(d.h)}</div></div>`:""}
     </div>
     ${mailDiff?`<div class="addr" style="margin-top:10px"><b style="color:var(--ink)">Tax bill mailed to:</b> ${esc(d.m)}</div>`:""}
-    <div class="why">${esc(d.w)}</div>
+    <details class="whyd"><summary>Why is this home flagged?</summary><div class="why">${esc(d.w)}</div></details>
     ${partners}
     ${aud?`<a class="btn" href="${aud}" target="_blank" rel="noopener">View on the county auditor's site</a>`:""}
     <a class="btn sub" href="index.html">County spreadsheets &amp; statewide map</a>
     <div class="note">Parcel ${esc(pid)}. A flag is a lead, not proof: the credit runs a year behind sales, two people can share a name, and a trust or LLC can qualify with the right paperwork on file. Check the auditor's record before drawing conclusions.</div>`;
-  card.classList.add("open");
+  card.classList.add("open");placeExpand();
   card.scrollTop=0;
-  card.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",async()=>{
-    const tc=b.dataset.gc,tp=b.dataset.goto;
-    const pd=await loadDetails(tc);
-    const td=pd&&pd[tp];
-    if(td&&td.ll)map.flyTo({center:td.ll,zoom:Math.max(map.getZoom(),15.2)});
-    openCard(tc,tp);
+  if(d.ll)map.easeTo({center:d.ll,offset:cardOffset(),duration:450,
+    ...(opts.zoom?{zoom:opts.zoom}:{})});
+  card.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>{
+    openCard(b.dataset.gc,b.dataset.goto,{zoom:Math.max(map.getZoom(),15.2)});
   }));
   drawLinks(county,pid);
 }
@@ -652,16 +693,27 @@ function openPlainCard(county,pid){
     <div class="addr" style="margin-top:6px">Not flagged by this audit.</div>
     ${aud?`<a class="btn" href="${aud}" target="_blank" rel="noopener">View on the county auditor's site</a>`:""}
     <div class="note">No duplicate owner-occupancy credit lead was found for this parcel in the current data.</div>`;
-  card.classList.add("open");
+  card.classList.add("open");placeExpand();
 }
 
 function drawLinksClear(){
+  linkBounds=null;
   const src=map.getSource("links");
   if(src)src.setData({type:"FeatureCollection",features:[]});
 }
 
+function placeExpand(){
+  const b=$("#expand"),card=$("#card");
+  if(!b)return;
+  if(window.innerWidth<640&&card.classList.contains("open"))
+    b.style.bottom=(card.offsetHeight+18)+"px";
+  else
+    b.style.bottom="";
+}
+
 function closeCard(){
   $("#card").classList.remove("open");
+  placeExpand();
   selectOnMap(null,null);
   drawLinksClear();
 }
