@@ -195,6 +195,13 @@ const TIERS={
 const usd=v=>"$"+Number(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function norm(s){return String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
+function coLabel(co){
+  co=String(co||"").trim();
+  if(co.length<2)return "";                 // blank, "0", single letters
+  if(/^[\d\s.\-#&,]+$/.test(co))return "";  // placeholder digits and punctuation
+  if(/^et\s?al\.?$/i.test(co))return "and others";
+  return "with "+co;
+}
 const nodash=p=>p.replace(/-/g,"");
 const ias=(host,path)=>p=>`https://${host}/${path||"Datalets/Datalet.aspx"}?mode=profileall&UseSearch=no&pin=${p}`;
 const pivot=host=>p=>`https://${host}/Parcel?Parcel=${p}`;
@@ -685,7 +692,7 @@ async function openCard(county,pid,opts={}){
   const aud=auditorUrl(county,pid);
   card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
     <h2>${esc(d.o)}</h2>
-    ${d.co?`<div class="co">with ${esc(d.co)}</div>`:""}
+    ${coLabel(d.co)?`<div class="co">${esc(coLabel(d.co))}</div>`:""}
     <div class="addr">${esc(d.a)}</div>
     <div class="cty">${esc(county)} County</div>
     <span class="chip" style="${chipStyle}">${tier.name}</span>
