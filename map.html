@@ -280,7 +280,7 @@ $("#expand").addEventListener("click",()=>{
     bigMap?map.cooperativeGestures.disable():map.cooperativeGestures.enable();
   if(window.parent!==window)
     parent.postMessage({auditExpand:bigMap},location.origin);
-  setTimeout(()=>map.resize(),350);
+  setTimeout(()=>{map.resize();placeExpand();},350);
 });
 function collapseAttrib(){
   const a=document.querySelector(".maplibregl-ctrl-attrib");
@@ -735,6 +735,7 @@ function placeExpand(){
   else
     b.style.bottom="";
 }
+window.addEventListener("resize",placeExpand);
 
 function closeCard(){
   $("#card").classList.remove("open");
