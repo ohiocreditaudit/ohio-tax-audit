@@ -214,6 +214,11 @@ let selCounty=null,selPid=null;
 const protocol=new pmtiles.Protocol();
 maplibregl.addProtocol("pmtiles",protocol.tile);
 const dataUrl=f=>new URL("data/map/"+f,location.href).href;
+const EMBED=document.documentElement.classList.contains("embed");
+function tellParent(county){
+  if(EMBED&&window.parent!==window)
+    parent.postMessage({auditCounty:county},location.origin);
+}
 
 const map=new maplibregl.Map({
   container:"map",
@@ -222,6 +227,7 @@ const map=new maplibregl.Map({
   zoom:6.4,
   minZoom:5.5,
   maxBounds:[[-86.2,37.5],[-79.2,42.9]],
+  cooperativeGestures:EMBED,
   attributionControl:{compact:true}
 });
 map.addControl(new maplibregl.NavigationControl({showCompass:false}),"bottom-right");
@@ -301,8 +307,10 @@ function addChoropleth(){
   map.on("mouseleave","county-fill",()=>{map.getCanvas().style.cursor="";tip.style.display="none"});
   map.on("click","county-fill",e=>{
     if(e.originalEvent._handled||map.getZoom()>=8.6)return;
-    const c=INDEX[e.features[0].properties.NAME];
+    const name=e.features[0].properties.NAME;
+    const c=INDEX[name];
     if(c)map.fitBounds([[c.bbox[0],c.bbox[1]],[c.bbox[2],c.bbox[3]]],{padding:40});
+    tellParent(name);
     tip.style.display="none";
   });
 }
@@ -505,6 +513,7 @@ function drawLinks(county,pid){
 async function openCard(county,pid){
   const card=$("#card");
   selectOnMap(county,pid);
+  tellParent(county);
   let d=DET[county]&&DET[county][pid];
   if(!d){
     card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
