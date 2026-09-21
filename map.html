@@ -240,6 +240,7 @@ const auditorUrl=(county,pid)=>AUDITOR[county]?AUDITOR[county](pid):null;
 
 let INDEX=null;                 // counties.json: bboxes, tier counts
 const DET={};                   // county -> details map
+const XTRA={};                  // county -> locations of linked-but-unlisted parcels
 const DETP={};                  // county -> fetch promise
 const ACTIVE=new Set();         // counties with tile layers added
 const enabled=new Set([0,1,2,3,4]);
@@ -421,7 +422,7 @@ function loadDetails(county){
   if(DETP[county])return DETP[county];
   const slug=INDEX&&INDEX[county]?INDEX[county].slug:county.toLowerCase();
   DETP[county]=fetch(dataUrl(slug+".json")).then(r=>r.json())
-    .then(j=>{DET[county]=j.parcels;return j.parcels})
+    .then(j=>{DET[county]=j.parcels;XTRA[county]=j.extra||{};return j.parcels})
     .catch(()=>{delete DETP[county];return null});
   return DETP[county];
 }
@@ -592,9 +593,10 @@ function drawLinks(county,pid){
   for(const[pc,ppid]of d.p.map(p=>[p[0],p[1]])){
     jobs.push(loadDetails(pc).then(pd=>{
       const rec=pd&&pd[ppid];
-      if(rec&&rec.ll){
-        feats.push({type:"Feature",geometry:{type:"LineString",coordinates:[d.ll,rec.ll]}});
-        feats.push({type:"Feature",geometry:{type:"Point",coordinates:rec.ll}});
+      const ll=(rec&&rec.ll)||(XTRA[pc]&&XTRA[pc][ppid]);
+      if(ll){
+        feats.push({type:"Feature",geometry:{type:"LineString",coordinates:[d.ll,ll]}});
+        feats.push({type:"Feature",geometry:{type:"Point",coordinates:ll}});
       }
     }));
   }
@@ -649,10 +651,14 @@ async function openCard(county,pid,opts={}){
     d=all&&all[pid];
     if(!d){
       const aud=auditorUrl(county,pid);
+      const xll=XTRA[county]&&XTRA[county][pid];
+      if(xll)map.easeTo({center:xll,offset:cardOffset(),duration:600,
+        zoom:Math.max(map.getZoom(),opts.zoom||15)});
       card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
         <h2>Parcel ${esc(pid)}</h2><div class="cty">${esc(county)} County</div>
-        <div class="addr" style="margin-top:8px">This parcel is referenced as a linked property but has no entry of its own in the ${esc(county)} County list, usually because its credit status there could not be confirmed from the county's published data.</div>
+        <div class="addr" style="margin-top:8px">This parcel is a linked property but has no entry of its own in the ${esc(county)} County list, usually because its credit status there could not be confirmed from the county's published data.</div>
         ${aud?`<a class="btn" href="${aud}" target="_blank" rel="noopener">View on the county auditor's site</a>`:""}`;
+      placeExpand();
       return;
     }
     if(selCounty!==county||selPid!==pid)return;
