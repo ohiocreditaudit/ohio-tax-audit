@@ -14,6 +14,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script>if(new URLSearchParams(location.search).has("embed"))document.documentElement.classList.add("embed")</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pmtiles@3.2.1/dist/pmtiles.js"></script>
@@ -125,6 +126,10 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(20px,3vw,30px);
   .legend{max-width:170px;padding:10px 11px}
   .card{top:auto;left:10px;right:10px;bottom:10px;width:auto;max-height:60%}
 }
+html.embed body{padding:0;background-image:none}
+html.embed .top,html.embed .lede,html.embed .foot{display:none}
+html.embed .page{max-width:none}
+html.embed .mapwrap{border:none;border-radius:0;box-shadow:none;min-height:100vh}
 </style>
 </head><body>
 <div class="page">
@@ -236,12 +241,14 @@ map.on("load",()=>{
   map.addSource("dots",{type:"vector",url:"pmtiles://"+dataUrl("state_dots.pmtiles"),
     attribution:"Parcel data: county auditors / Ohio statewide parcel program"});
   map.addLayer({id:"dots",type:"circle",source:"dots","source-layer":"flagged_pts",
-    maxzoom:13,paint:{
+    minzoom:7.5,maxzoom:13,
+    layout:{"circle-sort-key":["-",4,["get","s"]]},
+    paint:{
     "circle-color":tierColor("fill"),
-    "circle-radius":["interpolate",["linear"],["zoom"],5.5,1.1,9,2.4,11,3.4,12.9,5],
-    "circle-opacity":.85,
+    "circle-radius":["interpolate",["linear"],["zoom"],7.5,1.4,9,2.4,11,3.4,12.9,5],
+    "circle-opacity":["interpolate",["linear"],["zoom"],7.5,0,8.6,.85],
     "circle-stroke-color":"#FFFFFF",
-    "circle-stroke-width":["interpolate",["linear"],["zoom"],6,.15,12,.8]}});
+    "circle-stroke-width":["interpolate",["linear"],["zoom"],7.5,.15,12,.8]}});
   map.addSource("links",{type:"geojson",data:{type:"FeatureCollection",features:[]}});
   map.addLayer({id:"links",type:"line",source:"links",
     paint:{"line-color":"#6D4FC4","line-width":1.8,"line-dasharray":[2,1.6],"line-opacity":.85}});
@@ -250,14 +257,61 @@ map.on("load",()=>{
     paint:{"circle-color":"#6D4FC4","circle-radius":4,"circle-stroke-color":"#fff","circle-stroke-width":1.2}});
   wireDots();
   applyFilter();
+  addChoropleth();
   refreshCounties();
 });
 map.on("moveend",refreshCounties);
+
+let choroDone=false;
+function rampColor(t){
+  t=Math.sqrt(Math.max(0,Math.min(1,t)));
+  const a=[251,230,212],b=[194,65,12];
+  const c=a.map((v,i)=>Math.round(v+(b[i]-v)*t));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function addChoropleth(){
+  if(choroDone||!mapReady||!INDEX)return;
+  choroDone=true;
+  const maxN=Math.max(...Object.values(INDEX).map(c=>c.findings));
+  const expr=["match",["get","NAME"]];
+  for(const c in INDEX)expr.push(c,rampColor(INDEX[c].findings/maxN));
+  expr.push("#ECE8E2");
+  map.addSource("counties",{type:"geojson",data:dataUrl("counties.geojson")});
+  map.addLayer({id:"county-fill",type:"fill",source:"counties",maxzoom:9.6,
+    paint:{"fill-color":expr,
+    "fill-opacity":["interpolate",["linear"],["zoom"],7.8,.8,9.5,0]}},"dots");
+  map.addLayer({id:"county-line",type:"line",source:"counties",maxzoom:10.5,
+    paint:{"line-color":"rgba(26,21,18,.25)","line-width":.8,
+    "line-opacity":["interpolate",["linear"],["zoom"],9,.9,10.4,0]}},"dots");
+  map.addLayer({id:"county-label",type:"symbol",source:"counties",maxzoom:9,
+    layout:{"text-field":["get","NAME"],"text-font":["Noto Sans Regular"],
+    "text-size":["interpolate",["linear"],["zoom"],6,9,8,12]},
+    paint:{"text-color":"#57504A","text-halo-color":"#FFFFFF","text-halo-width":1.1}});
+  map.on("mousemove","county-fill",e=>{
+    if(map.getZoom()>=8.6)return;
+    const n=e.features[0].properties.NAME;
+    const c=INDEX[n];
+    map.getCanvas().style.cursor=c?"pointer":"";
+    tip.innerHTML=c
+      ?`<div class="o">${esc(n)} County</div><div class="d">${c.findings.toLocaleString()} flagged homes &middot; click to zoom in</div>`
+      :`<div class="o">${esc(n)} County</div><div class="d">not loaded yet</div>`;
+    tip.style.display="block";
+    positionTip(e.point);
+  });
+  map.on("mouseleave","county-fill",()=>{map.getCanvas().style.cursor="";tip.style.display="none"});
+  map.on("click","county-fill",e=>{
+    if(e.originalEvent._handled||map.getZoom()>=8.6)return;
+    const c=INDEX[e.features[0].properties.NAME];
+    if(c)map.fitBounds([[c.bbox[0],c.bbox[1]],[c.bbox[2],c.bbox[3]]],{padding:40});
+    tip.style.display="none";
+  });
+}
 
 fetch(dataUrl("counties.json")).then(r=>r.json()).then(j=>{
   INDEX=j;
   $("#loading").style.display="none";
   buildLegend();
+  addChoropleth();
   const m=location.hash.match(/c=([A-Za-z]+).*?p=([0-9A-Za-z .-]+)/);
   if(m){
     const county=m[1],pid=m[2];

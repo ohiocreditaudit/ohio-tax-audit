@@ -165,6 +165,17 @@ path[data-name].partner{stroke:var(--accent2);stroke-width:1.6}
   background:linear-gradient(90deg,var(--ramp0),var(--ramp1))}
 .chip{width:14px;height:8px;border-radius:3px;background:var(--nodata);
   border:1px solid var(--nodata-line);display:inline-block}
+.pmcard{margin-top:16px;border:1px solid var(--border);border-radius:var(--radius-lg);
+  background:var(--panel);box-shadow:var(--card-shadow);padding:22px 22px 14px;overflow:hidden}
+.pmhead{display:flex;gap:18px;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap}
+.pmhead h2{font-family:var(--disp);font-weight:660;font-size:22px;letter-spacing:-.015em;margin:0}
+.pmhead p{color:var(--ink2);font-size:13.5px;margin:6px 0 0;max-width:900px}
+.pmopen{margin-left:auto;flex:none;font-size:13px;font-weight:600;color:var(--accent);
+  text-decoration:none;border:1px solid var(--border);border-radius:999px;padding:9px 16px}
+.pmopen:hover{border-color:var(--accent)}
+.pmframe{display:block;width:100%;height:600px;border:1px solid var(--border);
+  border-radius:20px;background:#FAF8F5}
+@media (max-width:640px){.pmframe{height:440px}.pmcard{padding:16px 14px 10px}}
 .foot{color:var(--muted);font-size:11px;margin-top:26px;text-align:center;
   font-family:var(--mono);letter-spacing:.02em}
 @media (max-width:900px){.rightcol{flex:1 1 100%;max-width:none}}
@@ -212,6 +223,16 @@ path[data-name].partner{stroke:var(--accent2);stroke-width:1.6}
     <div class="panel" id="statepanel"></div>
   </div>
 </div>
+<section class="pmcard">
+  <div class="pmhead">
+    <div>
+      <h2>Every flagged home, on a real map</h2>
+      <p>The county view above shows totals. This map shows the homes themselves: start at the county shading, zoom in and the counties become dots, and the dots become parcels with the owner, the dollars, the linked properties, and the auditor's record. The crosshair button finds homes near you.</p>
+    </div>
+    <a class="pmopen" href="map.html">Open full screen &rarr;</a>
+  </div>
+  <iframe class="pmframe" src="map.html?embed=1" title="Ohio parcel map" loading="lazy"></iframe>
+</section>
 <footer class="foot">an independent project, not affiliated with the State of Ohio or any county auditor or tax agency &middot; tax year 2025 &middot; county totals only, no names on the map &middot; dollars are county figures or estimates &middot; <a href="privacy.html" style="color:inherit">privacy &amp; data</a></footer>
 </div>
 <script>
