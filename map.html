@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Franklin County Parcel Map | Ohio Owner-Occupancy Credit Audit</title>
+<meta name="description" content="Every parcel in Franklin County, Ohio, with the homes flagged for duplicate 2.5% owner-occupancy tax credits highlighted. Click a parcel for the dollar amount, the linked properties, and the county auditor's record.">
+<link rel="canonical" href="https://ohiotaxaudit.com/map.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ohiotaxaudit.com/map.html">
+<meta property="og:site_name" content="Ohio Owner-Occupancy Credit Audit">
+<meta property="og:title" content="Franklin County Parcel Map">
+<meta property="og:description" content="Every parcel in Franklin County with flagged owner-occupancy credits highlighted. Click a parcel for dollars, linked properties, and the auditor's record.">
+<meta property="og:image" content="https://ohiotaxaudit.com/icon-512.png">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pmtiles@3.2.1/dist/pmtiles.js"></script>
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/Inter.woff2') format('woff2')}
+@font-face{font-family:'Inter Tight';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/InterTight.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:100 800;font-display:swap;src:url('fonts/JetBrainsMono.woff2') format('woff2')}
+</style>
+<style>
+:root{
+  --bg:#FAF8F5; --panel:#FFFFFF; --ink:#1A1512; --ink2:#57504A; --muted:#8C857D;
+  --border:rgba(26,21,18,.11); --border-strong:rgba(26,21,18,.20);
+  --accent:#C2410C; --accent2:#6D4FC4;
+  --card-shadow:0 1px 2px rgba(26,21,18,.04),0 10px 30px rgba(26,21,18,.05);
+  --radius:24px; --radius-lg:32px;
+  --disp:"Inter Tight","Inter",system-ui,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",monospace;
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);
+  font-size:14px;line-height:1.5;padding:22px 20px;display:flex;flex-direction:column;
+  background-image:
+    radial-gradient(620px 420px at 10% 2%,rgba(194,65,12,.05),transparent 70%),
+    radial-gradient(700px 480px at 94% 100%,rgba(109,79,196,.045),transparent 70%);
+  background-attachment:fixed}
+.page{max-width:1400px;margin:0 auto;width:100%;display:flex;flex-direction:column;flex:1;min-height:0}
+.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);display:inline-block;padding:5px 12px;
+  border:1px solid var(--border);border-radius:999px;background:rgba(249,164,116,.05)}
+h1{font-family:var(--disp);font-weight:680;font-size:clamp(20px,3vw,30px);
+  line-height:1.05;letter-spacing:-.02em}
+.top .back{margin-left:auto;font-size:13px;color:var(--ink2);text-decoration:none;
+  border:1px solid var(--border);border-radius:999px;padding:7px 14px;background:var(--panel)}
+.top .back:hover{border-color:var(--border-strong);color:var(--ink)}
+.lede{color:var(--ink2);font-size:13.5px;margin:0 0 12px;max-width:1100px}
+.lede b{color:var(--accent);font-weight:600}
+.mapwrap{position:relative;flex:1;min-height:480px;border:1px solid var(--border);
+  border-radius:var(--radius-lg);background:var(--panel);box-shadow:var(--card-shadow);
+  overflow:hidden}
+#map{position:absolute;inset:0}
+.maplibregl-canvas{outline:none}
+.maplibregl-popup-content{font-family:var(--body);border-radius:14px;
+  box-shadow:0 4px 20px rgba(26,21,18,.15);padding:10px 12px}
+.legend{position:absolute;top:14px;left:14px;z-index:5;background:rgba(255,255,255,.94);
+  border:1px solid var(--border);border-radius:16px;padding:12px 14px;
+  box-shadow:var(--card-shadow);backdrop-filter:blur(4px);max-width:230px}
+.legend .k{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.legend label{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2);
+  padding:2.5px 0;cursor:pointer;user-select:none}
+.legend label:hover{color:var(--ink)}
+.legend .sw{width:12px;height:12px;border-radius:4px;flex:none;border:1px solid rgba(26,21,18,.2)}
+.legend .n{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.legend .zoomhint{font-size:11px;color:var(--muted);margin-top:8px;border-top:1px solid var(--border);padding-top:8px}
+.card{position:absolute;top:14px;right:14px;bottom:14px;z-index:6;width:340px;max-width:calc(100% - 28px);
+  background:var(--panel);border:1px solid var(--border);border-radius:20px;
+  box-shadow:0 4px 30px rgba(26,21,18,.14);padding:18px;overflow-y:auto;
+  display:none}
+.card.open{display:block}
+.card .close{position:absolute;top:10px;right:12px;border:none;background:none;
+  font-size:20px;color:var(--muted);cursor:pointer;line-height:1;padding:4px}
+.card .close:hover{color:var(--ink)}
+.card h2{font-family:var(--disp);font-weight:660;font-size:18px;letter-spacing:-.01em;
+  margin:0 26px 2px 0;line-height:1.2}
+.card .co{font-size:12.5px;color:var(--ink2)}
+.card .addr{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.chip{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;
+  text-transform:uppercase;font-weight:700;padding:4px 10px;border-radius:999px;margin:10px 0 0}
+.money{display:flex;gap:10px;margin:12px 0 0}
+.money .mtile{flex:1;border:1px solid var(--border);border-radius:14px;padding:10px 12px}
+.money .mk{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.money .mv{font-family:var(--disp);font-weight:660;font-size:20px;margin-top:4px;
+  font-variant-numeric:tabular-nums;color:var(--accent)}
+.card .why{font-size:12.5px;color:var(--ink2);margin-top:12px;line-height:1.5}
+.card .sec{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin:14px 0 6px}
+.plist{display:flex;flex-direction:column;gap:6px}
+.plist .prow{display:flex;align-items:center;gap:8px;border:1px solid var(--border);
+  border-radius:12px;padding:8px 10px;font-size:12px;color:var(--ink2);text-align:left;
+  background:none;font-family:var(--body);width:100%}
+.plist button.prow{cursor:pointer}
+.plist button.prow:hover{border-color:var(--accent);color:var(--ink)}
+.plist .pid{font-family:var(--mono);font-size:11px;color:var(--ink);flex:none}
+.plist .go{margin-left:auto;color:var(--accent);flex:none;font-size:14px}
+.btn{display:block;text-align:center;margin-top:14px;background:var(--accent);color:#FFF7F2;
+  font-weight:600;font-size:13px;padding:11px 16px;border-radius:999px;text-decoration:none}
+.btn:hover{filter:brightness(1.08)}
+.btn.sub{background:none;color:var(--ink2);border:1px solid var(--border);margin-top:8px;font-weight:500}
+.btn.sub:hover{border-color:var(--border-strong);color:var(--ink);filter:none}
+.card .note{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.45}
+.hovertip{position:absolute;z-index:7;pointer-events:none;background:rgba(255,255,255,.97);
+  border:1px solid var(--border);border-radius:12px;padding:8px 11px;font-size:12px;
+  box-shadow:0 4px 16px rgba(26,21,18,.13);display:none;max-width:240px}
+.hovertip .o{font-weight:600;color:var(--ink)}
+.hovertip .d{color:var(--ink2)}
+.hovertip .amt{font-family:var(--mono);color:var(--accent);font-weight:700}
+.loading{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;
+  font-family:var(--mono);font-size:12px;color:var(--muted);background:rgba(255,255,255,.9);
+  padding:10px 18px;border-radius:999px;border:1px solid var(--border)}
+.foot{color:var(--muted);font-size:11px;margin-top:14px;text-align:center}
+.foot a{color:inherit}
+@media (max-width:640px){
+  body{padding:14px 10px}
+  .legend{max-width:170px;padding:10px 11px}
+  .card{top:auto;left:10px;right:10px;bottom:10px;width:auto;max-height:60%}
+}
+</style>
+</head><body>
+<div class="page">
+  <div class="top">
+    <span class="eyebrow">Franklin County</span>
+    <h1>Parcel map</h1>
+    <a class="back" href="index.html">&larr; statewide dashboard</a>
+  </div>
+  <p class="lede">Every parcel in Franklin County. The colored ones are homes where the owner is getting the <b>2.5% owner-occupancy tax credit</b> and the audit flagged a possible duplicate: the same owner credited on two or more homes, or a company that does not qualify. Hover for a quick look, click for the dollars, the linked properties, and the county auditor's own record. Zoom in to see parcel lines.</p>
+  <div class="mapwrap">
+    <div id="map"></div>
+    <div class="legend" id="legend"><div class="k">Match strength</div></div>
+    <div class="hovertip" id="hovertip"></div>
+    <div class="card" id="card"></div>
+    <div class="loading" id="loading">loading parcel details&hellip;</div>
+  </div>
+  <footer class="foot">an independent project, not affiliated with the State of Ohio or any county auditor or tax agency &middot; a flag is a lead, not proof &middot; parcel lines and credit data: Franklin County Auditor public records, tax year 2025 &middot; <a href="privacy.html">privacy &amp; data</a></footer>
+</div>
+<script>
+"use strict";
+const $=q=>document.querySelector(q);
+const TIERS={
+  0:{name:"Strong lead",fill:"#9A3412",line:"#7C2D12"},
+  1:{name:"Very likely",fill:"#C2410C",line:"#9A3412"},
+  2:{name:"Likely",fill:"#E8973F",line:"#C2410C"},
+  3:{name:"Weak lead",fill:"#CDC3B6",line:"#A89C8C"},
+  4:{name:"Company or trust",fill:"#6D4FC4",line:"#54389F"}
+};
+const usd=v=>"$"+Number(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const auditorUrl=pid=>"https://audr-apps.franklincountyohio.gov/redir/Link/Parcel/"+pid.replace(/-/g,"");
+let details=null, tierCounts=null;
+const enabled=new Set([0,1,2,3,4]);
+let selected=null;
+
+const protocol=new pmtiles.Protocol();
+maplibregl.addProtocol("pmtiles",protocol.tile);
+const tilesUrl=new URL("data/map/franklin.pmtiles",location.href).href;
+
+const map=new maplibregl.Map({
+  container:"map",
+  style:"https://tiles.openfreemap.org/styles/positron",
+  center:[-83.00,39.97],
+  zoom:9.6,
+  minZoom:8.5,
+  maxBounds:[[-83.85,39.45],[-82.20,40.50]],
+  attributionControl:{compact:true}
+});
+map.addControl(new maplibregl.NavigationControl({showCompass:false}),"bottom-right");
+
+const matchTier=["match",["get","s"],0,0,1,1,2,2,3,3,4,4,3];
+const tierColor=prop=>["match",["get","s"],
+  0,TIERS[0][prop],1,TIERS[1][prop],2,TIERS[2][prop],3,TIERS[3][prop],4,TIERS[4][prop],TIERS[3][prop]];
+
+map.on("load",()=>{
+  map.addSource("audit",{type:"vector",url:"pmtiles://"+tilesUrl,attribution:"Parcel data: Franklin County Auditor"});
+  const firstSymbol=(map.getStyle().layers.find(l=>l.type==="symbol")||{}).id;
+  map.addLayer({id:"parcel-fill",type:"fill",source:"audit","source-layer":"parcels",
+    minzoom:14,paint:{"fill-color":"#1A1512","fill-opacity":0.01}},firstSymbol);
+  map.addLayer({id:"parcel-line",type:"line",source:"audit","source-layer":"parcels",
+    minzoom:14,paint:{"line-color":"rgba(26,21,18,.55)",
+    "line-opacity":["interpolate",["linear"],["zoom"],14,.14,16,.32],
+    "line-width":["interpolate",["linear"],["zoom"],14,.4,17,1.1]}},firstSymbol);
+  map.addLayer({id:"flag-fill",type:"fill",source:"audit","source-layer":"flagged",
+    minzoom:12,paint:{"fill-color":tierColor("fill"),
+    "fill-opacity":["interpolate",["linear"],["zoom"],12,.45,15,.6]}},firstSymbol);
+  map.addLayer({id:"flag-line",type:"line",source:"audit","source-layer":"flagged",
+    minzoom:12,paint:{"line-color":tierColor("line"),"line-width":["interpolate",["linear"],["zoom"],12,.4,16,1.6]}},firstSymbol);
+  map.addLayer({id:"flag-sel",type:"line",source:"audit","source-layer":"flagged",
+    minzoom:12,paint:{"line-color":"#1A1512","line-width":3},filter:["==",["get","pid"],""]},firstSymbol);
+  map.addLayer({id:"flag-pts",type:"circle",source:"audit","source-layer":"flagged_pts",
+    maxzoom:13,paint:{
+    "circle-color":tierColor("fill"),
+    "circle-radius":["interpolate",["linear"],["zoom"],8,1.6,11,3.2,12.9,5],
+    "circle-opacity":.85,
+    "circle-stroke-color":"#FFFFFF",
+    "circle-stroke-width":["interpolate",["linear"],["zoom"],8,.2,12,.8]}});
+  applyFilter();
+  wireEvents();
+});
+
+function applyFilter(){
+  const f=["in",["get","s"],["literal",[...enabled]]];
+  for(const id of["flag-fill","flag-line","flag-pts"])
+    if(map.getLayer(id))map.setFilter(id,f);
+}
+
+function buildLegend(){
+  const lg=$("#legend");
+  for(const t of[0,1,2,3,4]){
+    const row=document.createElement("label");
+    const n=tierCounts?tierCounts[t]||0:"";
+    row.innerHTML=`<input type="checkbox" checked data-t="${t}" style="accent-color:${TIERS[t].fill}">
+      <span class="sw" style="background:${TIERS[t].fill}"></span>${TIERS[t].name}
+      <span class="n">${n?n.toLocaleString():""}</span>`;
+    row.querySelector("input").addEventListener("change",e=>{
+      e.target.checked?enabled.add(t):enabled.delete(t);
+      applyFilter();
+    });
+    lg.appendChild(row);
+  }
+  const hint=document.createElement("div");
+  hint.className="zoomhint";
+  hint.textContent="Zoom in for parcel lines. A flag is a lead, not proof.";
+  lg.appendChild(hint);
+}
+
+function wireEvents(){
+  const tip=$("#hovertip");
+  const hoverables=["flag-fill","flag-pts"];
+  for(const layer of hoverables){
+    map.on("mousemove",layer,e=>{
+      map.getCanvas().style.cursor="pointer";
+      const f=e.features[0];
+      if(!f)return;
+      const pid=f.properties.pid;
+      const d=details&&details[pid];
+      const owner=d?d.o:pid;
+      const money=f.properties.c?usd(f.properties.c):"";
+      const tier=TIERS[f.properties.s]||TIERS[3];
+      tip.innerHTML=`<div class="o">${esc(owner)}</div>
+        <div class="d">${d?esc(d.a):"parcel "+esc(pid)}</div>
+        <div><span class="amt">${money}</span> <span class="d">credit this year &middot; ${tier.name}</span></div>
+        <div class="d" style="margin-top:2px">click for details</div>`;
+      tip.style.display="block";
+      positionTip(tip,e.point);
+    });
+    map.on("mouseleave",layer,()=>{
+      map.getCanvas().style.cursor="";
+      tip.style.display="none";
+    });
+    map.on("click",layer,e=>{
+      tip.style.display="none";
+      const f=e.features[0];
+      if(f)openCard(f.properties.pid);
+      e.originalEvent._handled=true;
+    });
+  }
+  map.on("click","parcel-fill",e=>{
+    if(e.originalEvent._handled)return;
+    const flagged=map.queryRenderedFeatures(e.point,{layers:["flag-fill"]});
+    if(flagged.length)return;
+    const f=e.features[0];
+    if(f)openPlainCard(f.properties.pid);
+  });
+  map.on("click",e=>{
+    if(e.originalEvent._handled)return;
+    const hits=map.queryRenderedFeatures(e.point,{layers:["flag-fill","flag-pts","parcel-fill"].filter(l=>map.getLayer(l))});
+    if(!hits.length)closeCard();
+  });
+}
+
+function positionTip(tip,pt){
+  const wrap=$(".mapwrap").getBoundingClientRect();
+  let x=pt.x+14,y=pt.y+14;
+  if(x+tip.offsetWidth>wrap.width-10)x=pt.x-tip.offsetWidth-10;
+  if(y+tip.offsetHeight>wrap.height-10)y=pt.y-tip.offsetHeight-10;
+  tip.style.left=x+"px";tip.style.top=y+"px";
+}
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function norm(s){return String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
+
+function selectOnMap(pid){
+  selected=pid;
+  if(map.getLayer("flag-sel"))map.setFilter("flag-sel",["==",["get","pid"],pid]);
+}
+
+function openCard(pid){
+  const card=$("#card");
+  const d=details&&details[pid];
+  selectOnMap(pid);
+  if(!d){
+    card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
+      <h2>Parcel ${esc(pid)}</h2>
+      <div class="addr">Details are still loading. Try again in a moment.</div>`;
+    card.classList.add("open");
+    return;
+  }
+  const tier=TIERS[d.s]||TIERS[3];
+  const chipStyle=d.s===3
+    ?`background:rgba(26,21,18,.07);color:var(--ink2)`
+    :`background:${tier.fill}1A;color:${tier.line}`;
+  const mailDiff=d.m&&norm(d.m)!==norm(d.a);
+  let partners="";
+  if(d.p&&d.p.length){
+    partners=`<div class="sec">Same name also credited at</div><div class="plist">`+
+      d.p.map(p=>{
+        const [county,ppid,paddr]=p;
+        const local=county==="Franklin"&&details[ppid];
+        if(local){
+          return `<button class="prow" data-goto="${esc(ppid)}"><span class="pid">${esc(ppid)}</span>
+            <span>${esc(paddr)}</span><span class="go">&rarr;</span></button>`;
+        }
+        return `<div class="prow"><span class="pid">${esc(county)} ${esc(ppid)}</span><span>${esc(paddr)}</span></div>`;
+      }).join("")+`</div>`+
+      (d.pm?`<div class="note">plus ${d.pm} more, see the spreadsheet for the full list</div>`:"");
+  }
+  card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
+    <h2>${esc(d.o)}</h2>
+    ${d.co?`<div class="co">with ${esc(d.co)}</div>`:""}
+    <div class="addr">${esc(d.a)}</div>
+    <span class="chip" style="${chipStyle}">${tier.name}</span>
+    <div class="money">
+      <div class="mtile"><div class="mk">Credit this year</div><div class="mv">${usd(d.c)}</div></div>
+      ${d.h?`<div class="mtile"><div class="mk">Homestead</div><div class="mv">${usd(d.h)}</div></div>`:""}
+    </div>
+    ${mailDiff?`<div class="addr" style="margin-top:10px"><b style="color:var(--ink)">Tax bill mailed to:</b> ${esc(d.m)}</div>`:""}
+    <div class="why">${esc(d.w)}</div>
+    ${partners}
+    <a class="btn" href="${auditorUrl(pid)}" target="_blank" rel="noopener">View on the county auditor's site</a>
+    <a class="btn sub" href="index.html">County spreadsheets &amp; statewide map</a>
+    <div class="note">Parcel ${esc(pid)}. A flag is a lead, not proof: the credit runs a year behind sales, two people can share a name, and a trust or LLC can qualify with the right paperwork on file. Check the auditor's record before drawing conclusions.</div>`;
+  card.classList.add("open");
+  card.scrollTop=0;
+  card.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>{
+    const t=b.dataset.goto,td=details[t];
+    if(td&&td.ll)map.flyTo({center:td.ll,zoom:Math.max(map.getZoom(),15.2)});
+    openCard(t);
+  }));
+}
+
+function openPlainCard(pid){
+  selectOnMap("");
+  const card=$("#card");
+  card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
+    <h2>Parcel ${esc(pid)}</h2>
+    <div class="addr" style="margin-top:6px">Not flagged by this audit.</div>
+    <a class="btn" href="${auditorUrl(pid+"-00")}" target="_blank" rel="noopener">View on the county auditor's site</a>
+    <div class="note">No duplicate owner-occupancy credit lead was found for this parcel in the current data.</div>`;
+  card.classList.add("open");
+}
+
+function closeCard(){
+  $("#card").classList.remove("open");
+  selectOnMap("");
+}
+window.closeCard=closeCard;
+
+fetch("data/map/franklin.json")
+  .then(r=>r.json())
+  .then(j=>{
+    details=j.parcels;
+    tierCounts={};
+    for(const pid in details){
+      const s=details[pid].s;
+      tierCounts[s]=(tierCounts[s]||0)+1;
+    }
+    $("#loading").style.display="none";
+    buildLegend();
+    const m=location.hash.match(/p=([0-9-]+)/);
+    if(m&&details[m[1]]){
+      const d=details[m[1]];
+      if(d.ll)map.jumpTo({center:d.ll,zoom:15.5});
+      const open=()=>openCard(m[1]);
+      map.loaded()?open():map.once("idle",open);
+    }
+  })
+  .catch(()=>{
+    $("#loading").textContent="could not load parcel details";
+    buildLegend();
+  });
+</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "d7f5b9372dda4d1ebe442c6cd88088c1"}'></script></body></html>
