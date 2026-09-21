@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Franklin County Parcel Map | Ohio Owner-Occupancy Credit Audit</title>
-<meta name="description" content="Every parcel in Franklin County, Ohio, with the homes flagged for duplicate 2.5% owner-occupancy tax credits highlighted. Click a parcel for the dollar amount, the linked properties, and the county auditor's record.">
+<title>Ohio Parcel Map | Ohio Owner-Occupancy Credit Audit</title>
+<meta name="description" content="An interactive parcel map of Ohio's owner-occupancy tax credit audit: every flagged home in 52 counties as dots on a street map, with parcel lines when you zoom in, dollar amounts, linked properties, and county auditor records.">
 <link rel="canonical" href="https://ohiotaxaudit.com/map.html">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ohiotaxaudit.com/map.html">
 <meta property="og:site_name" content="Ohio Owner-Occupancy Credit Audit">
-<meta property="og:title" content="Franklin County Parcel Map">
-<meta property="og:description" content="Every parcel in Franklin County with flagged owner-occupancy credits highlighted. Click a parcel for dollars, linked properties, and the auditor's record.">
+<meta property="og:title" content="Ohio Parcel Map">
+<meta property="og:description" content="Every flagged home in 52 Ohio counties on a street map. Zoom in for parcel lines; click a parcel for dollars, linked properties, and the auditor's record.">
 <meta property="og:image" content="https://ohiotaxaudit.com/icon-512.png">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -63,7 +63,7 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(20px,3vw,30px);
   box-shadow:0 4px 20px rgba(26,21,18,.15);padding:10px 12px}
 .legend{position:absolute;top:14px;left:14px;z-index:5;background:rgba(255,255,255,.94);
   border:1px solid var(--border);border-radius:16px;padding:12px 14px;
-  box-shadow:var(--card-shadow);backdrop-filter:blur(4px);max-width:230px}
+  box-shadow:var(--card-shadow);backdrop-filter:blur(4px);max-width:240px}
 .legend .k{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
   text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .legend label{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2);
@@ -84,6 +84,7 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(20px,3vw,30px);
   margin:0 26px 2px 0;line-height:1.2}
 .card .co{font-size:12.5px;color:var(--ink2)}
 .card .addr{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.card .cty{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
 .chip{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;
   text-transform:uppercase;font-weight:700;padding:4px 10px;border-radius:999px;margin:10px 0 0}
 .money{display:flex;gap:10px;margin:12px 0 0}
@@ -128,19 +129,19 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(20px,3vw,30px);
 </head><body>
 <div class="page">
   <div class="top">
-    <span class="eyebrow">Franklin County</span>
-    <h1>Parcel map</h1>
+    <span class="eyebrow">52 counties</span>
+    <h1>Ohio parcel map</h1>
     <a class="back" href="index.html">&larr; statewide dashboard</a>
   </div>
-  <p class="lede">Every parcel in Franklin County. The colored ones are homes where the owner is getting the <b>2.5% owner-occupancy tax credit</b> and the audit flagged a possible duplicate: the same owner credited on two or more homes, or a company that does not qualify. Hover for a quick look, click for the dollars, the linked properties, and the county auditor's own record. Zoom in to see parcel lines.</p>
+  <p class="lede">Every home flagged by the audit, on a real map. The colored dots are properties where the owner is getting the <b>2.5% owner-occupancy tax credit</b> and the audit found a possible duplicate: the same owner credited on two or more homes, or a company that does not qualify. Zoom in to see parcel lines, hover for a quick look, and click for the dollars, the linked properties, and the county auditor's own record. The crosshair button finds homes near you.</p>
   <div class="mapwrap">
     <div id="map"></div>
     <div class="legend" id="legend"><div class="k">Match strength</div></div>
     <div class="hovertip" id="hovertip"></div>
     <div class="card" id="card"></div>
-    <div class="loading" id="loading">loading parcel details&hellip;</div>
+    <div class="loading" id="loading">loading map data&hellip;</div>
   </div>
-  <footer class="foot">an independent project, not affiliated with the State of Ohio or any county auditor or tax agency &middot; a flag is a lead, not proof &middot; parcel lines and credit data: Franklin County Auditor public records, tax year 2025 &middot; <a href="privacy.html">privacy &amp; data</a></footer>
+  <footer class="foot">an independent project, not affiliated with the State of Ohio or any county auditor or tax agency &middot; a flag is a lead, not proof &middot; parcel lines: county auditors via the Ohio statewide parcel program; credit data: county auditor public records, tax year 2025 &middot; <a href="privacy.html">privacy &amp; data</a></footer>
 </div>
 <script>
 "use strict";
@@ -153,68 +154,185 @@ const TIERS={
   4:{name:"Company or trust",fill:"#6D4FC4",line:"#54389F"}
 };
 const usd=v=>"$"+Number(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
-const auditorUrl=pid=>"https://audr-apps.franklincountyohio.gov/redir/Link/Parcel/"+pid.replace(/-/g,"");
-let details=null, tierCounts=null;
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function norm(s){return String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
+const nodash=p=>p.replace(/-/g,"");
+const ias=(host,path)=>p=>`https://${host}/${path||"Datalets/Datalet.aspx"}?mode=profileall&UseSearch=no&pin=${p}`;
+const pivot=host=>p=>`https://${host}/Parcel?Parcel=${p}`;
+const beacon=q=>p=>"https://beacon.schneidercorp.com/Application.aspx?"+q.replace("{pid}",p);
+const AUDITOR={
+  Franklin:p=>"https://audr-apps.franklincountyohio.gov/redir/Link/Parcel/"+nodash(p),
+  Cuyahoga:p=>`https://myplace.cuyahogacounty.gov/${btoa(p)}?city=OTk=&searchBy=UGFyY2Vs`,
+  Hamilton:p=>`https://wedge.hcauditor.org/view/re/${p.slice(1)}00`,
+  Summit:ias("propertyaccess.summitoh.net"),
+  Montgomery:p=>`https://www.mcrealestate.org/Datalets/Datalet.aspx?mode=profileall&UseSearch=no&pin=${p.replace(/ /g,"%20")}`,
+  Lucas:p=>`https://icare.co.lucas.oh.us/lucascare/datalets/datalet.aspx?mode=summary&UseSearch=no&pin=${p}&jur=048&taxyr=2026&LMparent=20`,
+  Stark:ias("realestate.starkcountyohio.gov"),
+  Butler:ias("propertysearch.bcohio.gov"),
+  Warren:p=>`https://auditor.warrencountyohio.gov/propertysearch/Search/PerformParcelSearch?ParcelNumber=${p}&TaxYearId=59ace439-808b-4eb4-9f96-bf15dcbe3023`,
+  Lake:p=>ias("auditor.lakecountyohio.gov")(nodash(p)),
+  Fairfield:p=>`https://auditorrealestate.fairfieldcountyohio.gov/Parcel?Parcel=${p}`,
+  Medina:pivot("auditor.medinacounty.gov"),
+  Clark:pivot("clarkcountyauditor.org"),
+  Mahoning:pivot("auditor.mahoningcountyoh.gov"),
+  Madison:pivot("auditor.co.madison.oh.us"),
+  Pickaway:pivot("auditor.pickawaycountyohio.gov"),
+  Wayne:pivot("waynecountyauditor.org"),
+  Williams:pivot("realestate.williamscountyoh.gov"),
+  Athens:p=>`https://www.athenscountyauditor.org/Parcel?parcel=${p}`,
+  Washington:p=>`https://auditorwashingtoncountyohio.gov/Parcel?parcel=${p}`,
+  Guernsey:p=>`https://auditor.guernseycounty.gov/Parcel?parcel=${p}`,
+  Highland:p=>`https://highlandcountyauditor.org/Parcel?Parcel=${p.slice(0,2)}-${p.slice(2,4)}-${p.slice(4,7)}-${p.slice(7,10)}.${p.slice(10,12)}`,
+  Delaware:p=>`https://delaware-auditor-ohio.manatron.com/Property.aspx?mpropertynumber=${p}&mtab=property`,
+  Licking:p=>`https://ontrac.lickingcounty.gov/?p=${p}`,
+  Clermont:p=>`https://www.clermontauditorrealestate.org/_web/datalets/datalet.aspx?mode=profileall&UseSearch=no&pin=${p}`,
+  Ashtabula:p=>`https://auditor.ashtabulacounty.gov/PT/Datalets/Datalet.aspx?mode=profileall&UseSearch=no&pin=${p}`,
+  Columbiana:p=>`https://oh-columbiana-auditor.publicaccessnow.com/PropReport.aspx?mpropertynumber=${p}`,
+  Portage:beacon("App=PortageCountyOH&LayerID=30592&PageTypeID=4&KeyValue={pid}"),
+  Trumbull:beacon("AppID=1121&LayerID=28255&PageTypeID=4&KeyValue={pid}"),
+  Adams:beacon("AppID=1135&LayerID=28756&PageTypeID=4&KeyValue={pid}"),
+  Knox:beacon("AppID=1124&LayerID=28285&PageTypeID=4&PageID=11642&KeyValue={pid}"),
+  Allen:beacon("AppID=1178&LayerID=34847&PageTypeID=4&PageID=13177&KeyValue={pid}"),
+  Union:p=>`https://beacon.schneidercorp.com/Application.aspx?AppID=1260&LayerID=41600&PageTypeID=4&PageID=15350&KeyValue=${p.slice(0,2)}-${p.slice(2,9)}.${p.slice(9)}`,
+  Huron:p=>beacon("AppID=1132&LayerID=28629&PageTypeID=4&PageID=11905&KeyValue={pid}")(nodash(p)),
+  Ottawa:p=>beacon("AppID=1142&LayerID=29348&PageTypeID=4&PageID=12176&KeyValue={pid}")(nodash(p))
+};
+const auditorUrl=(county,pid)=>AUDITOR[county]?AUDITOR[county](pid):null;
+
+let INDEX=null;                 // counties.json: bboxes, tier counts
+const DET={};                   // county -> details map
+const DETP={};                  // county -> fetch promise
+const ACTIVE=new Set();         // counties with tile layers added
 const enabled=new Set([0,1,2,3,4]);
-let selected=null;
+let selCounty=null,selPid=null;
 
 const protocol=new pmtiles.Protocol();
 maplibregl.addProtocol("pmtiles",protocol.tile);
-const tilesUrl=new URL("data/map/franklin.pmtiles",location.href).href;
+const dataUrl=f=>new URL("data/map/"+f,location.href).href;
 
 const map=new maplibregl.Map({
   container:"map",
   style:"https://tiles.openfreemap.org/styles/positron",
-  center:[-83.00,39.97],
-  zoom:9.6,
-  minZoom:8.5,
-  maxBounds:[[-83.85,39.45],[-82.20,40.50]],
+  center:[-82.75,40.15],
+  zoom:6.4,
+  minZoom:5.5,
+  maxBounds:[[-86.2,37.5],[-79.2,42.9]],
   attributionControl:{compact:true}
 });
 map.addControl(new maplibregl.NavigationControl({showCompass:false}),"bottom-right");
+map.addControl(new maplibregl.GeolocateControl({
+  positionOptions:{enableHighAccuracy:true},
+  fitBoundsOptions:{maxZoom:15.4},
+  trackUserLocation:false
+}),"bottom-right");
 
-const matchTier=["match",["get","s"],0,0,1,1,2,2,3,3,4,4,3];
 const tierColor=prop=>["match",["get","s"],
   0,TIERS[0][prop],1,TIERS[1][prop],2,TIERS[2][prop],3,TIERS[3][prop],4,TIERS[4][prop],TIERS[3][prop]];
+let firstSymbol=null,mapReady=false;
 
 map.on("load",()=>{
-  map.addSource("audit",{type:"vector",url:"pmtiles://"+tilesUrl,attribution:"Parcel data: Franklin County Auditor"});
-  const firstSymbol=(map.getStyle().layers.find(l=>l.type==="symbol")||{}).id;
-  map.addLayer({id:"parcel-fill",type:"fill",source:"audit","source-layer":"parcels",
+  mapReady=true;
+  firstSymbol=(map.getStyle().layers.find(l=>l.type==="symbol")||{}).id;
+  map.addSource("dots",{type:"vector",url:"pmtiles://"+dataUrl("state_dots.pmtiles"),
+    attribution:"Parcel data: county auditors / Ohio statewide parcel program"});
+  map.addLayer({id:"dots",type:"circle",source:"dots","source-layer":"flagged_pts",
+    maxzoom:13,paint:{
+    "circle-color":tierColor("fill"),
+    "circle-radius":["interpolate",["linear"],["zoom"],5.5,1.1,9,2.4,11,3.4,12.9,5],
+    "circle-opacity":.85,
+    "circle-stroke-color":"#FFFFFF",
+    "circle-stroke-width":["interpolate",["linear"],["zoom"],6,.15,12,.8]}});
+  map.addSource("links",{type:"geojson",data:{type:"FeatureCollection",features:[]}});
+  map.addLayer({id:"links",type:"line",source:"links",
+    paint:{"line-color":"#6D4FC4","line-width":1.8,"line-dasharray":[2,1.6],"line-opacity":.85}});
+  map.addLayer({id:"links-pts",type:"circle",source:"links",
+    filter:["==",["geometry-type"],"Point"],
+    paint:{"circle-color":"#6D4FC4","circle-radius":4,"circle-stroke-color":"#fff","circle-stroke-width":1.2}});
+  wireDots();
+  applyFilter();
+  refreshCounties();
+});
+map.on("moveend",refreshCounties);
+
+fetch(dataUrl("counties.json")).then(r=>r.json()).then(j=>{
+  INDEX=j;
+  $("#loading").style.display="none";
+  buildLegend();
+  const m=location.hash.match(/c=([A-Za-z]+).*?p=([0-9A-Za-z .-]+)/);
+  if(m){
+    const county=m[1],pid=m[2];
+    loadDetails(county).then(d=>{
+      const rec=d&&d[pid];
+      if(rec&&rec.ll){map.jumpTo({center:rec.ll,zoom:15.5});openCard(county,pid);}
+    });
+  }
+}).catch(()=>{$("#loading").textContent="could not load map data"});
+
+function loadDetails(county){
+  if(DET[county])return Promise.resolve(DET[county]);
+  if(DETP[county])return DETP[county];
+  const slug=INDEX&&INDEX[county]?INDEX[county].slug:county.toLowerCase();
+  DETP[county]=fetch(dataUrl(slug+".json")).then(r=>r.json())
+    .then(j=>{DET[county]=j.parcels;return j.parcels})
+    .catch(()=>{delete DETP[county];return null});
+  return DETP[county];
+}
+
+function countyLayers(county){
+  const slug=INDEX[county].slug,src="audit-"+slug;
+  if(ACTIVE.has(county))return;
+  ACTIVE.add(county);
+  map.addSource(src,{type:"vector",url:"pmtiles://"+dataUrl(slug+".pmtiles")});
+  map.addLayer({id:"pf-"+slug,type:"fill",source:src,"source-layer":"parcels",
     minzoom:14,paint:{"fill-color":"#1A1512","fill-opacity":0.01}},firstSymbol);
-  map.addLayer({id:"parcel-line",type:"line",source:"audit","source-layer":"parcels",
+  map.addLayer({id:"pl-"+slug,type:"line",source:src,"source-layer":"parcels",
     minzoom:14,paint:{"line-color":"rgba(26,21,18,.55)",
     "line-opacity":["interpolate",["linear"],["zoom"],14,.14,16,.32],
     "line-width":["interpolate",["linear"],["zoom"],14,.4,17,1.1]}},firstSymbol);
-  map.addLayer({id:"flag-fill",type:"fill",source:"audit","source-layer":"flagged",
+  map.addLayer({id:"ff-"+slug,type:"fill",source:src,"source-layer":"flagged",
     minzoom:12,paint:{"fill-color":tierColor("fill"),
     "fill-opacity":["interpolate",["linear"],["zoom"],12,.45,15,.6]}},firstSymbol);
-  map.addLayer({id:"flag-line",type:"line",source:"audit","source-layer":"flagged",
-    minzoom:12,paint:{"line-color":tierColor("line"),"line-width":["interpolate",["linear"],["zoom"],12,.4,16,1.6]}},firstSymbol);
-  map.addLayer({id:"flag-sel",type:"line",source:"audit","source-layer":"flagged",
-    minzoom:12,paint:{"line-color":"#1A1512","line-width":3},filter:["==",["get","pid"],""]},firstSymbol);
-  map.addLayer({id:"flag-pts",type:"circle",source:"audit","source-layer":"flagged_pts",
-    maxzoom:13,paint:{
-    "circle-color":tierColor("fill"),
-    "circle-radius":["interpolate",["linear"],["zoom"],8,1.6,11,3.2,12.9,5],
-    "circle-opacity":.85,
-    "circle-stroke-color":"#FFFFFF",
-    "circle-stroke-width":["interpolate",["linear"],["zoom"],8,.2,12,.8]}});
+  map.addLayer({id:"fl-"+slug,type:"line",source:src,"source-layer":"flagged",
+    minzoom:12,paint:{"line-color":tierColor("line"),
+    "line-width":["interpolate",["linear"],["zoom"],12,.4,16,1.6]}},firstSymbol);
+  map.addLayer({id:"fs-"+slug,type:"line",source:src,"source-layer":"flagged",
+    minzoom:12,paint:{"line-color":"#1A1512","line-width":3},
+    filter:["==",["get","pid"],""]},firstSymbol);
+  wireCounty(county,slug);
   applyFilter();
-  wireEvents();
-});
+}
+
+function refreshCounties(){
+  if(!mapReady||!INDEX||map.getZoom()<11.2)return;
+  const b=map.getBounds();
+  for(const county in INDEX){
+    if(ACTIVE.has(county))continue;
+    const [w,s,e,n]=INDEX[county].bbox;
+    if(b.getWest()<e&&b.getEast()>w&&b.getSouth()<n&&b.getNorth()>s){
+      countyLayers(county);
+      loadDetails(county);
+    }
+  }
+}
 
 function applyFilter(){
   const f=["in",["get","s"],["literal",[...enabled]]];
-  for(const id of["flag-fill","flag-line","flag-pts"])
-    if(map.getLayer(id))map.setFilter(id,f);
+  if(map.getLayer("dots"))map.setFilter("dots",f);
+  for(const county of ACTIVE){
+    const slug=INDEX[county].slug;
+    for(const id of["ff-"+slug,"fl-"+slug])
+      if(map.getLayer(id))map.setFilter(id,f);
+  }
 }
 
 function buildLegend(){
   const lg=$("#legend");
+  const totals={};
+  for(const c in INDEX)for(const t in INDEX[c].tiers)
+    totals[t]=(totals[t]||0)+INDEX[c].tiers[t];
   for(const t of[0,1,2,3,4]){
     const row=document.createElement("label");
-    const n=tierCounts?tierCounts[t]||0:"";
+    const n=totals[t]||0;
     row.innerHTML=`<input type="checkbox" checked data-t="${t}" style="accent-color:${TIERS[t].fill}">
       <span class="sw" style="background:${TIERS[t].fill}"></span>${TIERS[t].name}
       <span class="n">${n?n.toLocaleString():""}</span>`;
@@ -230,77 +348,126 @@ function buildLegend(){
   lg.appendChild(hint);
 }
 
-function wireEvents(){
-  const tip=$("#hovertip");
-  const hoverables=["flag-fill","flag-pts"];
-  for(const layer of hoverables){
-    map.on("mousemove",layer,e=>{
-      map.getCanvas().style.cursor="pointer";
-      const f=e.features[0];
-      if(!f)return;
-      const pid=f.properties.pid;
-      const d=details&&details[pid];
-      const owner=d?d.o:pid;
-      const money=f.properties.c?usd(f.properties.c):"";
-      const tier=TIERS[f.properties.s]||TIERS[3];
-      tip.innerHTML=`<div class="o">${esc(owner)}</div>
-        <div class="d">${d?esc(d.a):"parcel "+esc(pid)}</div>
-        <div><span class="amt">${money}</span> <span class="d">credit this year &middot; ${tier.name}</span></div>
-        <div class="d" style="margin-top:2px">click for details</div>`;
-      tip.style.display="block";
-      positionTip(tip,e.point);
-    });
-    map.on("mouseleave",layer,()=>{
-      map.getCanvas().style.cursor="";
-      tip.style.display="none";
-    });
-    map.on("click",layer,e=>{
-      tip.style.display="none";
-      const f=e.features[0];
-      if(f)openCard(f.properties.pid);
-      e.originalEvent._handled=true;
-    });
-  }
-  map.on("click","parcel-fill",e=>{
-    if(e.originalEvent._handled)return;
-    const flagged=map.queryRenderedFeatures(e.point,{layers:["flag-fill"]});
-    if(flagged.length)return;
-    const f=e.features[0];
-    if(f)openPlainCard(f.properties.pid);
-  });
-  map.on("click",e=>{
-    if(e.originalEvent._handled)return;
-    const hits=map.queryRenderedFeatures(e.point,{layers:["flag-fill","flag-pts","parcel-fill"].filter(l=>map.getLayer(l))});
-    if(!hits.length)closeCard();
-  });
-}
-
-function positionTip(tip,pt){
+const tip=$("#hovertip");
+function positionTip(pt){
   const wrap=$(".mapwrap").getBoundingClientRect();
   let x=pt.x+14,y=pt.y+14;
   if(x+tip.offsetWidth>wrap.width-10)x=pt.x-tip.offsetWidth-10;
   if(y+tip.offsetHeight>wrap.height-10)y=pt.y-tip.offsetHeight-10;
   tip.style.left=x+"px";tip.style.top=y+"px";
 }
-
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function norm(s){return String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
-
-function selectOnMap(pid){
-  selected=pid;
-  if(map.getLayer("flag-sel"))map.setFilter("flag-sel",["==",["get","pid"],pid]);
+function showTip(e,county,pid,s,c){
+  const d=DET[county]&&DET[county][pid];
+  const tier=TIERS[s]||TIERS[3];
+  const money=c?`<span class="amt">${usd(c)}</span> <span class="d">credit this year &middot; ${tier.name}</span>`
+    :`<span class="d">credit amount not published &middot; ${tier.name}</span>`;
+  tip.innerHTML=`<div class="o">${esc(d?d.o:pid)}</div>
+    <div class="d">${d?esc(d.a):county+" County parcel "+esc(pid)}</div>
+    <div>${money}</div>
+    <div class="d" style="margin-top:2px">click for details</div>`;
+  tip.style.display="block";
+  positionTip(e.point);
 }
 
-function openCard(pid){
+function wireDots(){
+  map.on("mousemove","dots",e=>{
+    map.getCanvas().style.cursor="pointer";
+    const f=e.features[0];if(!f)return;
+    const p=f.properties;
+    showTip(e,p.county,p.pid,p.s,p.c);
+    loadDetails(p.county);
+  });
+  map.on("mouseleave","dots",()=>{map.getCanvas().style.cursor="";tip.style.display="none"});
+  map.on("click","dots",e=>{
+    tip.style.display="none";
+    const f=e.features[0];if(!f)return;
+    openCard(f.properties.county,f.properties.pid);
+    e.originalEvent._handled=true;
+  });
+  map.on("click",e=>{
+    if(e.originalEvent._handled)return;
+    const layers=["dots"];
+    for(const county of ACTIVE){
+      const slug=INDEX[county].slug;
+      layers.push("ff-"+slug,"pf-"+slug);
+    }
+    const hits=map.queryRenderedFeatures(e.point,{layers:layers.filter(l=>map.getLayer(l))});
+    if(!hits.length)closeCard();
+  });
+}
+
+function wireCounty(county,slug){
+  map.on("mousemove","ff-"+slug,e=>{
+    map.getCanvas().style.cursor="pointer";
+    const f=e.features[0];if(!f)return;
+    showTip(e,county,f.properties.pid,f.properties.s,f.properties.c);
+  });
+  map.on("mouseleave","ff-"+slug,()=>{map.getCanvas().style.cursor="";tip.style.display="none"});
+  map.on("click","ff-"+slug,e=>{
+    tip.style.display="none";
+    const f=e.features[0];
+    if(f)openCard(county,f.properties.pid);
+    e.originalEvent._handled=true;
+  });
+  map.on("click","pf-"+slug,e=>{
+    if(e.originalEvent._handled)return;
+    const flagged=map.queryRenderedFeatures(e.point,{layers:["ff-"+slug]});
+    if(flagged.length)return;
+    const f=e.features[0];
+    if(f){openPlainCard(county,f.properties.pid);e.originalEvent._handled=true;}
+  });
+}
+
+function selectOnMap(county,pid){
+  selCounty=county;selPid=pid;
+  for(const c of ACTIVE){
+    const id="fs-"+INDEX[c].slug;
+    if(map.getLayer(id))map.setFilter(id,["==",["get","pid"],c===county?pid:""]);
+  }
+}
+
+function drawLinks(county,pid){
+  const src=map.getSource("links");
+  if(!src)return;
+  const d=DET[county]&&DET[county][pid];
+  if(!d||!d.ll||!d.p||!d.p.length){src.setData({type:"FeatureCollection",features:[]});return}
+  const feats=[];
+  const jobs=[];
+  for(const[pc,ppid]of d.p.map(p=>[p[0],p[1]])){
+    jobs.push(loadDetails(pc).then(pd=>{
+      const rec=pd&&pd[ppid];
+      if(rec&&rec.ll){
+        feats.push({type:"Feature",geometry:{type:"LineString",coordinates:[d.ll,rec.ll]}});
+        feats.push({type:"Feature",geometry:{type:"Point",coordinates:rec.ll}});
+      }
+    }));
+  }
+  Promise.all(jobs).then(()=>{
+    if(selCounty===county&&selPid===pid)
+      src.setData({type:"FeatureCollection",features:feats});
+  });
+}
+
+async function openCard(county,pid){
   const card=$("#card");
-  const d=details&&details[pid];
-  selectOnMap(pid);
+  selectOnMap(county,pid);
+  let d=DET[county]&&DET[county][pid];
   if(!d){
     card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
-      <h2>Parcel ${esc(pid)}</h2>
-      <div class="addr">Details are still loading. Try again in a moment.</div>`;
+      <h2>Parcel ${esc(pid)}</h2><div class="cty">${esc(county)} County</div>
+      <div class="addr" style="margin-top:8px">loading details&hellip;</div>`;
     card.classList.add("open");
-    return;
+    const all=await loadDetails(county);
+    d=all&&all[pid];
+    if(!d){
+      const aud=auditorUrl(county,pid);
+      card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
+        <h2>Parcel ${esc(pid)}</h2><div class="cty">${esc(county)} County</div>
+        <div class="addr" style="margin-top:8px">This parcel is referenced as a linked property but has no entry of its own in the ${esc(county)} County list, usually because its credit status there could not be confirmed from the county's published data.</div>
+        ${aud?`<a class="btn" href="${aud}" target="_blank" rel="noopener">View on the county auditor's site</a>`:""}`;
+      return;
+    }
+    if(selCounty!==county||selPid!==pid)return;
   }
   const tier=TIERS[d.s]||TIERS[3];
   const chipStyle=d.s===3
@@ -311,78 +478,72 @@ function openCard(pid){
   if(d.p&&d.p.length){
     partners=`<div class="sec">Same name also credited at</div><div class="plist">`+
       d.p.map(p=>{
-        const [county,ppid,paddr]=p;
-        const local=county==="Franklin"&&details[ppid];
-        if(local){
-          return `<button class="prow" data-goto="${esc(ppid)}"><span class="pid">${esc(ppid)}</span>
+        const [pc,ppid,paddr]=p;
+        const mapped=INDEX&&INDEX[pc];
+        if(mapped){
+          return `<button class="prow" data-gc="${esc(pc)}" data-goto="${esc(ppid)}"><span class="pid">${pc===county?esc(ppid):esc(pc)+" "+esc(ppid)}</span>
             <span>${esc(paddr)}</span><span class="go">&rarr;</span></button>`;
         }
-        return `<div class="prow"><span class="pid">${esc(county)} ${esc(ppid)}</span><span>${esc(paddr)}</span></div>`;
+        return `<div class="prow"><span class="pid">${esc(pc)} ${esc(ppid)}</span><span>${esc(paddr)}</span></div>`;
       }).join("")+`</div>`+
       (d.pm?`<div class="note">plus ${d.pm} more, see the spreadsheet for the full list</div>`:"");
   }
+  const aud=auditorUrl(county,pid);
   card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
     <h2>${esc(d.o)}</h2>
     ${d.co?`<div class="co">with ${esc(d.co)}</div>`:""}
     <div class="addr">${esc(d.a)}</div>
+    <div class="cty">${esc(county)} County</div>
     <span class="chip" style="${chipStyle}">${tier.name}</span>
     <div class="money">
-      <div class="mtile"><div class="mk">Credit this year</div><div class="mv">${usd(d.c)}</div></div>
+      <div class="mtile"><div class="mk">Credit this year</div>${d.c
+        ?`<div class="mv">${usd(d.c)}</div>`
+        :`<div class="mv" style="font-size:12px;color:var(--muted);font-weight:500;line-height:1.4">this county publishes the credit roll but not the dollar amount</div>`}</div>
       ${d.h?`<div class="mtile"><div class="mk">Homestead</div><div class="mv">${usd(d.h)}</div></div>`:""}
     </div>
     ${mailDiff?`<div class="addr" style="margin-top:10px"><b style="color:var(--ink)">Tax bill mailed to:</b> ${esc(d.m)}</div>`:""}
     <div class="why">${esc(d.w)}</div>
     ${partners}
-    <a class="btn" href="${auditorUrl(pid)}" target="_blank" rel="noopener">View on the county auditor's site</a>
+    ${aud?`<a class="btn" href="${aud}" target="_blank" rel="noopener">View on the county auditor's site</a>`:""}
     <a class="btn sub" href="index.html">County spreadsheets &amp; statewide map</a>
     <div class="note">Parcel ${esc(pid)}. A flag is a lead, not proof: the credit runs a year behind sales, two people can share a name, and a trust or LLC can qualify with the right paperwork on file. Check the auditor's record before drawing conclusions.</div>`;
   card.classList.add("open");
   card.scrollTop=0;
-  card.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>{
-    const t=b.dataset.goto,td=details[t];
+  card.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",async()=>{
+    const tc=b.dataset.gc,tp=b.dataset.goto;
+    const pd=await loadDetails(tc);
+    const td=pd&&pd[tp];
     if(td&&td.ll)map.flyTo({center:td.ll,zoom:Math.max(map.getZoom(),15.2)});
-    openCard(t);
+    openCard(tc,tp);
   }));
+  drawLinks(county,pid);
 }
 
-function openPlainCard(pid){
-  selectOnMap("");
+function openPlainCard(county,pid){
+  selectOnMap(null,null);
+  drawLinksClear();
+  // unflagged parcels carry the state GIS id, which only matches the
+  // auditor's own format for Franklin (base id + -00 suffix)
+  const aud=county==="Franklin"?auditorUrl(county,pid+"-00"):null;
   const card=$("#card");
   card.innerHTML=`<button class="close" onclick="closeCard()">&times;</button>
     <h2>Parcel ${esc(pid)}</h2>
+    <div class="cty">${esc(county)} County</div>
     <div class="addr" style="margin-top:6px">Not flagged by this audit.</div>
-    <a class="btn" href="${auditorUrl(pid+"-00")}" target="_blank" rel="noopener">View on the county auditor's site</a>
+    ${aud?`<a class="btn" href="${aud}" target="_blank" rel="noopener">View on the county auditor's site</a>`:""}
     <div class="note">No duplicate owner-occupancy credit lead was found for this parcel in the current data.</div>`;
   card.classList.add("open");
 }
 
+function drawLinksClear(){
+  const src=map.getSource("links");
+  if(src)src.setData({type:"FeatureCollection",features:[]});
+}
+
 function closeCard(){
   $("#card").classList.remove("open");
-  selectOnMap("");
+  selectOnMap(null,null);
+  drawLinksClear();
 }
 window.closeCard=closeCard;
-
-fetch("data/map/franklin.json")
-  .then(r=>r.json())
-  .then(j=>{
-    details=j.parcels;
-    tierCounts={};
-    for(const pid in details){
-      const s=details[pid].s;
-      tierCounts[s]=(tierCounts[s]||0)+1;
-    }
-    $("#loading").style.display="none";
-    buildLegend();
-    const m=location.hash.match(/p=([0-9-]+)/);
-    if(m&&details[m[1]]){
-      const d=details[m[1]];
-      if(d.ll)map.jumpTo({center:d.ll,zoom:15.5});
-      const open=()=>openCard(m[1]);
-      map.loaded()?open():map.once("idle",open);
-    }
-  })
-  .catch(()=>{
-    $("#loading").textContent="could not load parcel details";
-    buildLegend();
-  });
 </script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "d7f5b9372dda4d1ebe442c6cd88088c1"}'></script></body></html>
