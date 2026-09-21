@@ -314,11 +314,17 @@ map.on("load",()=>{
     "circle-stroke-color":"#FFFFFF",
     "circle-stroke-width":["interpolate",["linear"],["zoom"],7.5,.15,12,.8]}});
   map.addSource("links",{type:"geojson",data:{type:"FeatureCollection",features:[]}});
+  map.addLayer({id:"links-case",type:"line",source:"links",
+    paint:{"line-color":"#FFFFFF","line-opacity":.9,
+    "line-width":["interpolate",["linear"],["zoom"],6,6,10,5,16,3.6]}});
   map.addLayer({id:"links",type:"line",source:"links",
-    paint:{"line-color":"#6D4FC4","line-width":1.8,"line-dasharray":[2,1.6],"line-opacity":.85}});
+    paint:{"line-color":"#6D4FC4","line-dasharray":[2,1.6],"line-opacity":.95,
+    "line-width":["interpolate",["linear"],["zoom"],6,3.2,10,2.6,16,1.8]}});
   map.addLayer({id:"links-pts",type:"circle",source:"links",
     filter:["==",["geometry-type"],"Point"],
-    paint:{"circle-color":"#6D4FC4","circle-radius":4,"circle-stroke-color":"#fff","circle-stroke-width":1.2}});
+    paint:{"circle-color":"#6D4FC4",
+    "circle-radius":["interpolate",["linear"],["zoom"],6,6,12,4.5],
+    "circle-stroke-color":"#fff","circle-stroke-width":1.5}});
   map.addLayer({id:"links-hit",type:"line",source:"links",
     paint:{"line-width":14,"line-color":"#000","line-opacity":0.01}});
   map.on("mousemove","links-hit",e=>{
@@ -333,7 +339,7 @@ map.on("load",()=>{
     const flayers=[];
     for(const county of ACTIVE)flayers.push("ff-"+INDEX[county].slug);
     if(map.queryRenderedFeatures(e.point,{layers:flayers.filter(l=>map.getLayer(l))}).length)return;
-    map.fitBounds(linkBounds,{padding:80,maxZoom:15});
+    fitClear(linkBounds);
     tip.style.display="none";
     e.originalEvent._handled=true;
   });
@@ -386,7 +392,10 @@ function addChoropleth(){
     if(e.originalEvent._handled||map.getZoom()>=8.6)return;
     const name=e.features[0].properties.NAME;
     const c=INDEX[name];
-    if(c)map.fitBounds([[c.bbox[0],c.bbox[1]],[c.bbox[2],c.bbox[3]]],{padding:40});
+    if(c){
+      const cam=map.cameraForBounds([[c.bbox[0],c.bbox[1]],[c.bbox[2],c.bbox[3]]],{padding:40});
+      if(cam)map.easeTo({...cam,duration:900});
+    }
     tellParent(name);
     tip.style.display="none";
   });
@@ -599,6 +608,22 @@ function drawLinks(county,pid){
     }
     linkBounds=b;
   });
+}
+
+// fit bounds inside the area the open card leaves visible, without
+// leaving persistent camera padding behind
+function fitClear(bounds,basePad){
+  if(!bounds)return;
+  const p=basePad||70;
+  const pad={top:p,bottom:p,left:p,right:p};
+  const card=$("#card");
+  if(card.classList.contains("open")){
+    if(window.innerWidth<640)pad.bottom=Math.min(card.offsetHeight+50,
+      document.querySelector(".mapwrap").clientHeight*0.6);
+    else pad.right=390;
+  }
+  const cam=map.cameraForBounds(bounds,{padding:pad,maxZoom:15});
+  if(cam)map.easeTo({...cam,duration:800});
 }
 
 function cardOffset(){

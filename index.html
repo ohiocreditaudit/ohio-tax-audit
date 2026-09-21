@@ -72,7 +72,7 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(30px,5vw,50px);
   font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
 .tile .v.accent{color:var(--accent)}
 .tile .m{font-size:12px;color:var(--ink2);margin-top:5px}
-.toggles{display:flex;gap:8px;margin:28px 0 16px;flex-wrap:wrap}
+.toggles{display:flex;gap:8px;margin:6px 0 0;flex-wrap:wrap}
 .toggles button{font-family:var(--body);font-size:13px;font-weight:500;
   border:1px solid var(--border);background:transparent;color:var(--ink2);
   padding:9px 16px;border-radius:999px;cursor:pointer;transition:all .18s}
@@ -210,16 +210,16 @@ path[data-name].partner{stroke:var(--accent2);stroke-width:1.6}
   agencies.</p>
 </header>
 <div class="statstrip"><div class="tile"><div class="k">Counties loaded</div><div class="v">52</div><div class="m">counties with data</div></div><div class="tile"><div class="k">Extra credit / yr, one county</div><div class="v accent">$2,000,145</div><div class="m">same name, 2+ homes in a county</div></div><div class="tile"><div class="k">Strong cross-county leads</div><div class="v accent">12,814</div><div class="m">same owner in two counties</div></div><div class="tile"><div class="k">Company-owned credit / yr</div><div class="v accent">$2,025,629</div><div class="m">held by an LLC or corporation</div></div></div>
-<div class="toggles">
-  <button data-mode="incounty" class="on">Same county</button>
-  <button data-mode="cross">Across counties</button>
-  <button data-mode="entity">Company-owned</button>
-</div>
 <div class="wrap">
   <div class="mapbox">
     <iframe class="homeframe" src="map.html?embed=1" title="Ohio parcel map"></iframe>
   </div>
   <div class="rightcol">
+    <div class="toggles">
+      <button data-mode="incounty" class="on">Same county</button>
+      <button data-mode="cross">Across counties</button>
+      <button data-mode="entity">Company-owned</button>
+    </div>
     <div class="panel" id="panel"></div>
     <div class="panel" id="statepanel"></div>
   </div>
