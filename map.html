@@ -127,9 +127,14 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(20px,3vw,30px);
 .hovertip .o{font-weight:600;color:var(--ink)}
 .hovertip .d{color:var(--ink2)}
 .hovertip .amt{font-family:var(--mono);color:var(--accent);font-weight:700}
-.loading{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;
-  font-family:var(--mono);font-size:12px;color:var(--muted);background:rgba(255,255,255,.9);
-  padding:10px 18px;border-radius:999px;border:1px solid var(--border)}
+.loading{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:4;
+  font-family:var(--mono);font-size:11px;color:var(--ink2);background:rgba(255,255,255,.95);
+  padding:7px 14px 7px 12px;border-radius:999px;border:1px solid var(--border);
+  box-shadow:var(--card-shadow);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.loading::before{content:"";width:12px;height:12px;border-radius:50%;flex:none;
+  border:2px solid rgba(194,65,12,.25);border-top-color:var(--accent);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:640px){.loading{top:auto;bottom:14px;left:auto;right:14px;transform:none;font-size:10.5px}}
 .foot{color:var(--muted);font-size:11px;margin-top:14px;text-align:center}
 .foot a{color:inherit}
 @media (max-width:640px){
@@ -178,7 +183,7 @@ html.embed .mapwrap{border:none;border-radius:0;box-shadow:none;min-height:100vh
     <div class="hovertip" id="hovertip"></div>
     <div class="card" id="card"></div>
     <button class="expand" id="expand" type="button">&#x26F6; Full screen</button>
-    <div class="loading" id="loading">loading map data&hellip;</div>
+    <div class="loading" id="loading">loading flagged homes&hellip;</div>
   </div>
   <footer class="foot">an independent project, not affiliated with the State of Ohio or any county auditor or tax agency &middot; a flag is a lead, not proof &middot; parcel lines: county auditors via the Ohio statewide parcel program; credit data: county auditor public records, tax year 2025 &middot; <a href="privacy.html">privacy &amp; data</a></footer>
 </div>
@@ -418,9 +423,29 @@ function addChoropleth(){
   });
 }
 
+// "loading flagged homes" pill: shown while tiles or county details are in
+// flight, with a short delay so quick pans don't flicker it
+let pendingFetch=0,busyTimer=null;
+function setBusy(){
+  const on=pendingFetch>0||(mapReady&&!map.areTilesLoaded());
+  const el=$("#loading");
+  if(on){
+    if(!busyTimer&&el.style.display==="none")
+      busyTimer=setTimeout(()=>{busyTimer=null;if(pendingFetch>0||!map.areTilesLoaded())el.style.display="flex"},300);
+  }else{
+    if(busyTimer){clearTimeout(busyTimer);busyTimer=null}
+    el.style.display="none";
+  }
+}
+map.on("dataloading",()=>{if(mapReady)setBusy()});
+map.on("sourcedata",()=>{if(mapReady)setBusy()});
+map.on("idle",setBusy);
+
+pendingFetch++;
 fetch(dataUrl("counties.json")).then(r=>r.json()).then(j=>{
   INDEX=j;
   $("#loading").style.display="none";
+  setBusy();
   buildLegend();
   addChoropleth();
   const m=location.hash.match(/c=([A-Za-z]+)&p=([^&]+)/);
@@ -431,15 +456,18 @@ fetch(dataUrl("counties.json")).then(r=>r.json()).then(j=>{
       if(rec&&rec.ll){map.jumpTo({center:rec.ll,zoom:15.5});openCard(county,pid);}
     });
   }
-}).catch(()=>{$("#loading").textContent="could not load map data"});
+}).catch(()=>{$("#loading").textContent="could not load map data";$("#loading").style.display="flex"})
+  .finally(()=>{pendingFetch--;setBusy()});
 
 function loadDetails(county){
   if(DET[county])return Promise.resolve(DET[county]);
   if(DETP[county])return DETP[county];
   const slug=INDEX&&INDEX[county]?INDEX[county].slug:county.toLowerCase();
+  pendingFetch++;setBusy();
   DETP[county]=fetch(dataUrl(slug+".json")).then(r=>r.json())
     .then(j=>{DET[county]=j.parcels;XTRA[county]=j.extra||{};return j.parcels})
-    .catch(()=>{delete DETP[county];return null});
+    .catch(()=>{delete DETP[county];return null})
+    .finally(()=>{pendingFetch--;setBusy()});
   return DETP[county];
 }
 
