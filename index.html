@@ -60,7 +60,7 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(30px,5vw,50px);
 .maplink b{color:var(--accent);font-weight:600}
 .maplink .arrow{color:var(--accent);font-weight:600}
 .maplink:hover{border-color:var(--border-strong);transform:translateY(-1px)}
-.statstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 4px}
+.statstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 4px}
 .tile{border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;
   background:var(--panel);box-shadow:var(--card-shadow);
   transition:border-color .2s,transform .2s,box-shadow .2s}
@@ -72,10 +72,11 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(30px,5vw,50px);
   font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
 .tile .v.accent{color:var(--accent)}
 .tile .m{font-size:12px;color:var(--ink2);margin-top:5px}
-.toggles{display:flex;gap:8px;margin:6px 0 0;flex-wrap:wrap}
-.toggles button{font-family:var(--body);font-size:13px;font-weight:500;
+.toggles{display:flex;gap:6px;margin:6px 0 0;flex-wrap:nowrap}
+.toggles button{font-family:var(--body);font-size:11.5px;font-weight:500;flex:1 1 0;min-width:0;
+  white-space:nowrap;text-align:center;
   border:1px solid var(--border);background:transparent;color:var(--ink2);
-  padding:9px 16px;border-radius:999px;cursor:pointer;transition:all .18s}
+  padding:8px 4px;border-radius:999px;cursor:pointer;transition:all .18s}
 .toggles button:hover{border-color:var(--border-strong);color:var(--ink)}
 .toggles button.on{background:var(--accent);color:#1A120D;border-color:transparent;
   font-weight:600;box-shadow:0 0 26px rgba(249,164,116,.22)}
@@ -182,32 +183,37 @@ path[data-name].partner{stroke:var(--accent2);stroke-width:1.6}
   border-radius:0;background:#FAF8F5}
 .lockscroll{overflow:hidden}
 .lockscroll body{overflow:hidden}
+.more{margin-top:16px;border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--panel);box-shadow:var(--card-shadow);padding:16px 22px}
+.more summary{cursor:pointer;font-family:var(--disp);font-weight:640;font-size:16px;
+  color:var(--ink);list-style:none;display:flex;align-items:center;gap:10px;user-select:none}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:"▸";color:var(--accent);font-size:13px;transition:transform .15s}
+.more[open] summary::before{transform:rotate(90deg)}
+.more p{color:var(--ink2);font-size:14.5px;line-height:1.55;margin:12px 0 0}
+.more p b{color:var(--accent);font-weight:600}
+@media (max-width:640px){
+  h1{font-size:26px;margin-top:10px}
+  .lede{font-size:14.5px;margin-top:8px}
+  .statstrip{gap:10px;margin:14px 0 4px}
+  .tile{padding:11px 13px;border-radius:18px}
+  .tile .k{font-size:9.5px}.tile .v{font-size:20px;margin-top:6px}.tile .m{font-size:11px;margin-top:3px}
+  .more{padding:14px 16px}.more summary{font-size:15px}.more p{font-size:13.5px}
+}
 .foot{color:var(--muted);font-size:11px;margin-top:26px;text-align:center;
   font-family:var(--mono);letter-spacing:.02em}
 @media (max-width:900px){.rightcol{flex:1 1 100%;max-width:none}}
 @media (max-width:720px){.statstrip{grid-template-columns:repeat(2,1fr)}
-  body{padding:22px 14px}.panel,.mapbox{border-radius:var(--radius)}}
+  body{padding:12px 12px}.panel,.mapbox{border-radius:var(--radius)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head><body>
 <div class="page">
 <header>
   <span class="eyebrow">Ohio Dept. of Taxation &middot; ORC 323.152(B)</span>
-  <h1>Owner-Occupancy Credit Audit</h1>
+  <h1>Ohio Owner-Occupancy Credit Audit</h1>
   <p class="lede">Ohio gives homeowners a <b>2.5% tax break</b> on the one home they
   live in, but across the state that one-home-only credit is being claimed on
-  <b>two or more properties</b> under the same name. It slips through in three ways.
-  Inside a county, the auditor holds
-  the whole roll, so the same name credited on two homes simply shouldn't happen.
-  Across county lines there is no check at all: you sign a form saying you don't
-  claim it anywhere else, and the 88 auditors never compare rolls. And a company or
-  trust can hold the credit only when the
-  proper paperwork is on file for the person actually living there.</p>
-  <p class="lede">This site reads the public credit rolls from 52 counties and flags
-  all three: the same name credited twice in one county, the same name credited in
-  two counties, and company-owned homes that owe a paperwork check. <b>Click</b> any
-  county to see its records and download the list. Gray counties aren't loaded
-  yet. This site is not affiliated with the State of Ohio, county auditors or tax
-  agencies.</p>
+  <b>two or more properties</b> under the same name.</p>
 </header>
 <div class="statstrip"><div class="tile"><div class="k">Counties loaded</div><div class="v">52</div><div class="m">counties with data</div></div><div class="tile"><div class="k">Extra credit / yr, one county</div><div class="v accent">$2,000,145</div><div class="m">same name, 2+ homes in a county</div></div><div class="tile"><div class="k">Strong cross-county leads</div><div class="v accent">12,814</div><div class="m">same owner in two counties</div></div><div class="tile"><div class="k">Company-owned credit / yr</div><div class="v accent">$2,025,629</div><div class="m">held by an LLC or corporation</div></div></div>
 <div class="wrap">
@@ -224,6 +230,21 @@ path[data-name].partner{stroke:var(--accent2);stroke-width:1.6}
     <div class="panel" id="statepanel"></div>
   </div>
 </div>
+<details class="more">
+  <summary>How the credit slips through, and what this site checks</summary>
+  <p>It slips through in three ways. Inside a county, the auditor holds the whole
+  roll, so the same name credited on two homes simply shouldn't happen. Across
+  county lines there is no check at all: you sign a form saying you don't claim it
+  anywhere else, and the 88 auditors never compare rolls. And a company or trust
+  can hold the credit only when the proper paperwork is on file for the person
+  actually living there.</p>
+  <p>This site reads the public credit rolls from 52 counties and flags all three:
+  the same name credited twice in one county, the same name credited in two
+  counties, and company-owned homes that owe a paperwork check. <b>Click</b> any
+  county on the map to see its records and download the list; zoom in and the
+  counties become individual homes. Gray counties aren't loaded yet. This site is
+  not affiliated with the State of Ohio, county auditors or tax agencies.</p>
+</details>
 <footer class="foot">an independent project, not affiliated with the State of Ohio or any county auditor or tax agency &middot; tax year 2025 &middot; owner names on parcel cards come from public county records &middot; dollars are county figures or estimates &middot; <a href="privacy.html" style="color:inherit">privacy &amp; data</a></footer>
 </div>
 <script>
