@@ -127,7 +127,7 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(20px,3vw,30px);
 .hovertip .o{font-weight:600;color:var(--ink)}
 .hovertip .d{color:var(--ink2)}
 .hovertip .amt{font-family:var(--mono);color:var(--accent);font-weight:700}
-.loading{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:4;
+.loading{position:absolute;right:14px;top:14px;z-index:5;
   font-family:var(--mono);font-size:11px;color:var(--ink2);background:rgba(255,255,255,.95);
   padding:7px 14px 7px 12px;border-radius:999px;border:1px solid var(--border);
   box-shadow:var(--card-shadow);display:flex;align-items:center;gap:8px;white-space:nowrap}
@@ -426,12 +426,14 @@ function addChoropleth(){
 // "loading flagged homes" pill: shown while tiles or county details are in
 // flight, with a short delay so quick pans don't flicker it
 let pendingFetch=0,busyTimer=null;
+// until the map's load event the basemap and dots are still coming in
+const isBusy=()=>pendingFetch>0||!mapReady||!map.areTilesLoaded();
 function setBusy(){
-  const on=pendingFetch>0||(mapReady&&!map.areTilesLoaded());
+  const on=isBusy();
   const el=$("#loading");
   if(on){
     if(!busyTimer&&el.style.display==="none")
-      busyTimer=setTimeout(()=>{busyTimer=null;if(pendingFetch>0||!map.areTilesLoaded())el.style.display="flex"},300);
+      busyTimer=setTimeout(()=>{busyTimer=null;if(isBusy())el.style.display="flex"},300);
   }else{
     if(busyTimer){clearTimeout(busyTimer);busyTimer=null}
     el.style.display="none";
@@ -440,11 +442,11 @@ function setBusy(){
 map.on("dataloading",()=>{if(mapReady)setBusy()});
 map.on("sourcedata",()=>{if(mapReady)setBusy()});
 map.on("idle",setBusy);
+map.on("load",setBusy);
 
 pendingFetch++;
 fetch(dataUrl("counties.json")).then(r=>r.json()).then(j=>{
   INDEX=j;
-  $("#loading").style.display="none";
   setBusy();
   buildLegend();
   addChoropleth();
