@@ -152,7 +152,14 @@ h1{font-family:var(--disp);font-weight:680;font-size:clamp(20px,3vw,30px);
   .plist .prow{padding:6px 8px;font-size:11px}
   .btn{padding:9px 14px;font-size:12px;margin-top:10px}
   .card .note{font-size:10px;margin-top:9px}
+  .card{padding-right:18px;scrollbar-width:none}
+  .card::-webkit-scrollbar{display:none}
 }
+/* phones hide scrollbars until you scroll, so the card draws its own */
+.cardbar{position:absolute;z-index:7;width:4px;border-radius:4px;
+  background:rgba(26,21,18,.08);pointer-events:none;display:none}
+.cardbar i{position:absolute;left:0;right:0;border-radius:4px;background:var(--accent);opacity:.6}
+@media (min-width:641px){.cardbar{display:none!important}}
 .expand{position:absolute;left:14px;bottom:14px;z-index:8;display:none;
   align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--accent);
   background:rgba(255,255,255,.95);border:1px solid var(--border);border-radius:999px;
@@ -182,6 +189,7 @@ html.embed .mapwrap{border:none;border-radius:0;box-shadow:none;min-height:100vh
     <div class="legend" id="legend"><div class="k">Match strength</div></div>
     <div class="hovertip" id="hovertip"></div>
     <div class="card" id="card"></div>
+    <div class="cardbar" id="cardbar"><i></i></div>
     <button class="expand" id="expand" type="button">&#x26F6; Full screen</button>
     <div class="loading" id="loading">loading flagged homes&hellip;</div>
   </div>
@@ -788,6 +796,27 @@ function placeExpand(){
     b.style.bottom="";
 }
 window.addEventListener("resize",placeExpand);
+
+let barFrame=0;
+function syncCardBar(){
+  barFrame=0;
+  const c=$("#card"),b=$("#cardbar");
+  if(!c.classList.contains("open")||c.scrollHeight<=c.clientHeight+2){b.style.display="none";return}
+  const inset=14,track=c.offsetHeight-inset*2;
+  b.style.display="block";
+  b.style.top=(c.offsetTop+inset)+"px";
+  b.style.height=track+"px";
+  b.style.left=(c.offsetLeft+c.offsetWidth-10)+"px";
+  const thumb=Math.max(28,track*c.clientHeight/c.scrollHeight);
+  const t=b.firstChild;
+  t.style.height=thumb+"px";
+  t.style.top=((track-thumb)*c.scrollTop/(c.scrollHeight-c.clientHeight))+"px";
+}
+const queueCardBar=()=>{if(!barFrame)barFrame=requestAnimationFrame(syncCardBar)};
+$("#card").addEventListener("scroll",queueCardBar,{passive:true});
+new MutationObserver(queueCardBar).observe($("#card"),{childList:true,subtree:true,attributes:true});
+new ResizeObserver(queueCardBar).observe($("#card"));
+window.addEventListener("resize",queueCardBar);
 
 function closeCard(){
   $("#card").classList.remove("open");
